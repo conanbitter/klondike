@@ -13,7 +13,9 @@ function love.draw()
 
     cards.draw(cards.back, 10, 10)
     cards.draw(cards.placeholder_homes[Suit.Clubs], 100, 10)
-    cards.draw_card(Suit.Diamonds, Rank.Queen, 10, 200)
+
+    local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+    cards.draw_card(Suit.Diamonds, Rank.Queen, mx - CARD_WIDTH / 2, my - CARD_HEIGHT / 2)
 
     love.graphics.pop()
 end
