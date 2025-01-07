@@ -20,12 +20,14 @@ end
 ---@field x number
 ---@field y number
 ---@field cards Card[]
----@field placeholder love.Quad
+---@field placeholder ?love.Quad
 ---@field draw function()
+---@field is_empty function():boolean
 
 ---@param self Deck
-local function draw_deck(self)
-    cards.draw(self.placeholder, self.x, self.y)
+---@return boolean
+local function desk_is_empty(self)
+    return #self.cards == 0
 end
 
 ---@param x number
@@ -37,7 +39,8 @@ local function new_deck(x, y)
         y = y,
         cards = {},
         placeholder = cards.placeholder_empty,
-        draw = draw_deck,
+        draw = nil,
+        is_empty = desk_is_empty
     }
 end
 
@@ -48,7 +51,7 @@ local FLAT_OFFSET = 14
 
 ---@param self FlatDeck
 local function draw_flat(self)
-    if #self.cards == 0 then
+    if self:is_empty() and self.placeholder then
         cards.draw(self.placeholder, self.x, self.y)
     end
     for i, card in ipairs(self.cards) do
@@ -72,7 +75,13 @@ end
 
 function module.init()
     local main_deck = {}
-    local decks = {}
+    local decks = {
+        all = {},
+        homes = {},
+        bases = {},
+        cursor = new_flat_deck(0, 0),
+        receivers = {},
+    }
 
     for suit = 1, 4 do
         for rank = 1, 13 do
@@ -86,7 +95,9 @@ function module.init()
         table.remove(main_deck, #main_deck)
     end
 
-    table.insert(decks, test_deck)
+    table.insert(decks.all, test_deck)
+
+    table.insert(decks.all, decks.cursor)
 
     return decks
 end

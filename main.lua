@@ -5,7 +5,6 @@ end
 local cards = require "cards"
 local decks = require "decks"
 
----@type Deck[]
 local deck_list
 
 function love.load()
@@ -20,14 +19,15 @@ function love.draw()
     love.graphics.push()
     love.graphics.scale(3, 3)
 
-    cards.draw(cards.back, 10, 10)
-    cards.draw(cards.placeholder_homes[Suit.Clubs], 100, 10)
-    for _, deck in ipairs(deck_list) do
-        deck:draw()
+    if not deck_list.cursor:is_empty() then
+        local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+        deck_list.cursor.x = mx - CARD_WIDTH / 2;
+        deck_list.cursor.y = my - CARD_HEIGHT / 2;
     end
 
-    --local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-    --cards.draw_card(temp, mx - CARD_WIDTH / 2, my - CARD_HEIGHT / 2)
+    for _, deck in ipairs(deck_list.all) do
+        deck:draw()
+    end
 
     love.graphics.pop()
 end
