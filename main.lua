@@ -35,6 +35,12 @@ function love.draw()
         end
     end
 
+    if not decks.card_intersect(100, 100, deck_list.cursor.x, deck_list.cursor.y) then
+        cards.draw(cards.back, 100, 100)
+    else
+        cards.draw(cards.placeholder_refresh, 100, 100)
+    end
+
     for _, deck in ipairs(deck_list.all) do
         deck:draw()
     end

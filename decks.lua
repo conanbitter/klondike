@@ -96,7 +96,7 @@ end
 ---@return FlatDeck
 local function new_flat_deck(x, y)
     local result = new_deck(x, y) --[[@as FlatDeck]]
-    result.covered = true
+    result.covered = 0
     result.draw = draw_flat
     result.trygrab = trygrab_flat
     return result
@@ -129,10 +129,21 @@ function module.init()
     table.insert(decks.active, test_deck)
 
     decks.cursor.placeholder = nil
-    decks.cursor.covered = 0
     table.insert(decks.all, decks.cursor)
 
     return decks
+end
+
+---@param x1 number
+---@param y1 number
+---@param x2 number
+---@param y2 number
+---@return boolean
+function module.card_intersect(x1, y1, x2, y2)
+    return x1 - x2 <= CARD_WIDTH and
+        x2 - x1 <= CARD_WIDTH and
+        y1 - y2 <= CARD_HEIGHT and
+        y2 - y1 <= CARD_HEIGHT
 end
 
 return module
