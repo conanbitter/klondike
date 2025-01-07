@@ -20,14 +20,26 @@ end
 ---@field x number
 ---@field y number
 ---@field cards Card[]
----@field placeholder ?love.Quad
+---@field placeholder love.Quad?
 ---@field draw function()
 ---@field is_empty function():boolean
+---@field give function(offset number,other Deck)
+---@field trygrab function(x number,y number, cursor Deck):boolean
 
 ---@param self Deck
 ---@return boolean
 local function desk_is_empty(self)
     return #self.cards == 0
+end
+
+---@param self Deck
+---@param offset number
+---@param other Deck
+local function desk_give(self, offset, other)
+    for i = offset, #self.cards do
+        table.insert(other.cards, self.cards[i])
+        self.cards[i] = nil
+    end
 end
 
 ---@param x number
@@ -40,11 +52,13 @@ local function new_deck(x, y)
         cards = {},
         placeholder = cards.placeholder_empty,
         draw = nil,
-        is_empty = desk_is_empty
+        is_empty = desk_is_empty,
+        give = desk_give,
+        trygrab = nil
     }
 end
 
-local FLAT_OFFSET = 14
+_G.FLAT_OFFSET = 14
 
 ---@class FlatDeck:Deck
 ---@field covered boolean
@@ -63,6 +77,26 @@ local function draw_flat(self)
     end
 end
 
+---@param self FlatDeck
+---@param x number
+---@param y number
+---@param cursor Deck
+---@return boolean
+local function trygrab_flat(self, x, y, cursor)
+    if x < self.x or x > self.x + CARD_WIDTH then return false end
+    if self.covered then
+        if y < self.y + (#self.cards - 1) * FLAT_OFFSET or y > self.y + CARD_HEIGHT + (#self.cards - 1) * FLAT_OFFSET then return false end
+        self:give(#self.cards, cursor)
+        return true
+    else
+        if y < self.y or y > self.y + CARD_HEIGHT + (#self.cards - 1) * FLAT_OFFSET then return false end
+        local index = math.floor((y - self.y) / FLAT_OFFSET) + 1
+        if index > #self.cards then index = #self.cards end
+        self:give(index, cursor)
+        return true
+    end
+end
+
 ---@param x number
 ---@param y number
 ---@return FlatDeck
@@ -70,6 +104,7 @@ local function new_flat_deck(x, y)
     local result = new_deck(x, y) --[[@as FlatDeck]]
     result.covered = true
     result.draw = draw_flat
+    result.trygrab = trygrab_flat
     return result
 end
 
@@ -80,7 +115,7 @@ function module.init()
         homes = {},
         bases = {},
         cursor = new_flat_deck(0, 0),
-        receivers = {},
+        active = {},
     }
 
     for suit = 1, 4 do
@@ -94,9 +129,13 @@ function module.init()
         table.insert(test_deck.cards, main_deck[#main_deck])
         table.remove(main_deck, #main_deck)
     end
+    test_deck.covered = true
 
     table.insert(decks.all, test_deck)
+    table.insert(decks.active, test_deck)
 
+    decks.cursor.placeholder = nil
+    decks.cursor.covered = false
     table.insert(decks.all, decks.cursor)
 
     return decks
