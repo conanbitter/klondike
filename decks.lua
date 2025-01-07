@@ -85,6 +85,7 @@ end
 ---@param cursor Deck
 ---@return boolean
 local function trygrab_flat(self, x, y, cursor)
+    if self:is_empty() then return false end
     if x < self.x or x > self.x + CARD_WIDTH then return false end
     if y < self.y + self.covered * FLAT_OFFSET or y >= self.y + CARD_HEIGHT + (#self.cards - 1) * FLAT_OFFSET then return false end
     local index = math.floor((y - self.y) / FLAT_OFFSET) + 1
@@ -97,7 +98,9 @@ end
 ---@param cursor Deck
 ---@return boolean
 local function trydrop_flat(self, cursor)
-    return module.card_intersect(cursor.x, cursor.y, self.x, self.y + (#self.cards - 1) * FLAT_OFFSET)
+    local offset = (#self.cards - 1) * FLAT_OFFSET
+    if offset < 0 then offset = 0 end
+    return module.card_intersect(cursor.x, cursor.y, self.x, self.y + offset)
 end
 
 ---@param x number
