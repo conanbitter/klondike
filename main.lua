@@ -20,13 +20,9 @@ function love.load()
     screen_transform:scale(3, 3)
 end
 
-function love.draw()
-    -- scaling
-    love.graphics.push()
-    love.graphics.applyTransform(screen_transform)
-
+function love.update(dt)
     if not deck_list.cursor:is_empty() then
-        local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
+        local mx, my = screen_transform:inverseTransformPoint(love.mouse.getPosition())
         deck_list.cursor.x = mx - CARD_WIDTH / 2;
         if #deck_list.cursor.cards == 1 then
             deck_list.cursor.y = my - CARD_HEIGHT / 2;
@@ -34,12 +30,12 @@ function love.draw()
             deck_list.cursor.y = my - FLAT_OFFSET / 2;
         end
     end
+end
 
-    if not decks.card_intersect(100, 100, deck_list.cursor.x, deck_list.cursor.y) then
-        cards.draw(cards.back, 100, 100)
-    else
-        cards.draw(cards.placeholder_refresh, 100, 100)
-    end
+function love.draw()
+    -- scaling
+    love.graphics.push()
+    love.graphics.applyTransform(screen_transform)
 
     for _, deck in ipairs(deck_list.all) do
         deck:draw()
@@ -61,6 +57,16 @@ function love.mousepressed(x, y, button, istouch, presses)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
+    for _, deck in ipairs(deck_list.active) do
+        if deck:trydrop(deck_list.cursor) then
+            deck_list.cursor:give(1, deck)
+            ---@cast old_place FlatDeck
+            if old_place ~= deck and old_place.covered ~= nil and old_place.covered >= #old_place.cards then
+                old_place.covered = #old_place.cards - 1
+            end
+            return
+        end
+    end
     if not deck_list.cursor:is_empty() and old_place then
         deck_list.cursor:give(1, old_place)
     end

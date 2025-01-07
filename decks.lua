@@ -25,6 +25,7 @@ end
 ---@field is_empty fun(self:Deck):boolean
 ---@field give fun(self:Deck, offset:number, other:Deck)
 ---@field trygrab fun(self:Deck, x:number, y:number, cursor:Deck):boolean
+---@field trydrop fun(self:Deck, cursor:Deck):boolean
 
 ---@param self Deck
 ---@return boolean
@@ -54,7 +55,8 @@ local function new_deck(x, y)
         draw = nil,
         is_empty = desk_is_empty,
         give = desk_give,
-        trygrab = nil
+        trygrab = nil,
+        trydrop = nil,
     }
 end
 
@@ -91,6 +93,13 @@ local function trygrab_flat(self, x, y, cursor)
     return true
 end
 
+---@param self FlatDeck
+---@param cursor Deck
+---@return boolean
+local function trydrop_flat(self, cursor)
+    return module.card_intersect(cursor.x, cursor.y, self.x, self.y + (#self.cards - 1) * FLAT_OFFSET)
+end
+
 ---@param x number
 ---@param y number
 ---@return FlatDeck
@@ -99,6 +108,7 @@ local function new_flat_deck(x, y)
     result.covered = 0
     result.draw = draw_flat
     result.trygrab = trygrab_flat
+    result.trydrop = trydrop_flat
     return result
 end
 
@@ -124,6 +134,16 @@ function module.init()
         table.remove(main_deck, #main_deck)
     end
     test_deck.covered = #test_deck.cards - 5
+
+    table.insert(decks.all, test_deck)
+    table.insert(decks.active, test_deck)
+
+    test_deck = new_flat_deck(100, 10)
+    for i = 1, 10 do
+        table.insert(test_deck.cards, main_deck[#main_deck])
+        table.remove(main_deck, #main_deck)
+    end
+    test_deck.covered = #test_deck.cards - 1
 
     table.insert(decks.all, test_deck)
     table.insert(decks.active, test_deck)
