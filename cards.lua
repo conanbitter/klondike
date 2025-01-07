@@ -46,7 +46,7 @@ module.placeholder_refresh = nil
 ---@type love.Quad[]
 module.placeholder_homes = {}
 
-function module.load()
+function module.init()
     sprites = love.graphics.newImage("sprites.png")
     module.back = love.graphics.newQuad(0, 240, CARD_WIDTH, CARD_HEIGHT, sprites)
 
