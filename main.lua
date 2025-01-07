@@ -3,6 +3,7 @@ local sprites
 
 function love.load()
     sprites = love.graphics.newImage("sprites.png")
+    love.graphics.setBackgroundColor(62 / 255, 140 / 255, 54 / 255)
 end
 
 function love.draw()
