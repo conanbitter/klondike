@@ -61,7 +61,7 @@ end
 _G.FLAT_OFFSET = 14
 
 ---@class FlatDeck:Deck
----@field covered boolean
+---@field covered number
 
 ---@param self FlatDeck
 local function draw_flat(self)
@@ -69,7 +69,7 @@ local function draw_flat(self)
         cards.draw(self.placeholder, self.x, self.y)
     end
     for i, card in ipairs(self.cards) do
-        if self.covered and i < #self.cards then
+        if i <= self.covered then
             cards.draw(cards.back, self.x, self.y + (i - 1) * FLAT_OFFSET)
         else
             cards.draw_card(card, self.x, self.y + (i - 1) * FLAT_OFFSET)
@@ -84,17 +84,11 @@ end
 ---@return boolean
 local function trygrab_flat(self, x, y, cursor)
     if x < self.x or x > self.x + CARD_WIDTH then return false end
-    if self.covered then
-        if y < self.y + (#self.cards - 1) * FLAT_OFFSET or y > self.y + CARD_HEIGHT + (#self.cards - 1) * FLAT_OFFSET then return false end
-        self:give(#self.cards, cursor)
-        return true
-    else
-        if y < self.y or y > self.y + CARD_HEIGHT + (#self.cards - 1) * FLAT_OFFSET then return false end
-        local index = math.floor((y - self.y) / FLAT_OFFSET) + 1
-        if index > #self.cards then index = #self.cards end
-        self:give(index, cursor)
-        return true
-    end
+    if y < self.y + self.covered * FLAT_OFFSET or y >= self.y + CARD_HEIGHT + (#self.cards - 1) * FLAT_OFFSET then return false end
+    local index = math.floor((y - self.y) / FLAT_OFFSET) + 1
+    if index > #self.cards then index = #self.cards end
+    self:give(index, cursor)
+    return true
 end
 
 ---@param x number
@@ -129,13 +123,13 @@ function module.init()
         table.insert(test_deck.cards, main_deck[#main_deck])
         table.remove(main_deck, #main_deck)
     end
-    test_deck.covered = true
+    test_deck.covered = #test_deck.cards - 5
 
     table.insert(decks.all, test_deck)
     table.insert(decks.active, test_deck)
 
     decks.cursor.placeholder = nil
-    decks.cursor.covered = false
+    decks.cursor.covered = 0
     table.insert(decks.all, decks.cursor)
 
     return decks
