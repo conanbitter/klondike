@@ -65,10 +65,10 @@ function module.load()
     module.placeholder_empty = love.graphics.newQuad(42, 240, CARD_WIDTH, CARD_HEIGHT, sprites)
     module.placeholder_refresh = love.graphics.newQuad(84, 240, CARD_WIDTH, CARD_HEIGHT, sprites)
     module.placeholder_homes = {
-        [module.Suit.Hearts] = love.graphics.newQuad(126, 240, CARD_WIDTH, CARD_HEIGHT, sprites),
-        [module.Suit.Diamonds] = love.graphics.newQuad(168, 240, CARD_WIDTH, CARD_HEIGHT, sprites),
-        [module.Suit.Clubs] = love.graphics.newQuad(210, 240, CARD_WIDTH, CARD_HEIGHT, sprites),
-        [module.Suit.Spades] = love.graphics.newQuad(252, 240, CARD_WIDTH, CARD_HEIGHT, sprites),
+        [Suit.Hearts] = love.graphics.newQuad(126, 240, CARD_WIDTH, CARD_HEIGHT, sprites),
+        [Suit.Diamonds] = love.graphics.newQuad(168, 240, CARD_WIDTH, CARD_HEIGHT, sprites),
+        [Suit.Clubs] = love.graphics.newQuad(210, 240, CARD_WIDTH, CARD_HEIGHT, sprites),
+        [Suit.Spades] = love.graphics.newQuad(252, 240, CARD_WIDTH, CARD_HEIGHT, sprites),
     }
 end
 
