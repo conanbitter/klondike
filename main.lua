@@ -1,9 +1,11 @@
 local cards = require "cards"
+local decks = require "decks"
 
 function love.load()
     love.graphics.setBackgroundColor(62 / 255, 140 / 255, 54 / 255)
     love.graphics.setDefaultFilter("nearest", "nearest")
     cards.load()
+    decks.init()
 end
 
 function love.draw()
