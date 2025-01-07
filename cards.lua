@@ -4,7 +4,7 @@ _G.CARD_WIDTH = 42
 _G.CARD_HEIGHT = 60
 
 ---@enum Suit
-module.Suit = {
+_G.Suit = {
     Hearts = 1,
     Diamonds = 2,
     Clubs = 3,
@@ -12,7 +12,7 @@ module.Suit = {
 }
 
 ---@enum Rank
-module.Rank = {
+_G.Rank = {
     Ace = 1,
     Two = 2,
     Three = 3,
