@@ -1,6 +1,6 @@
 local module = {}
 
-require "cards"
+local cards = require "cards"
 
 ---@class Card
 ---@field suit Suit
@@ -25,7 +25,7 @@ function module.init()
         end
     end
 
-    print(main_deck)
+    return main_deck[1]
 end
 
 return module

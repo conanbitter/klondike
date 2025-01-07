@@ -5,11 +5,13 @@ end
 local cards = require "cards"
 local decks = require "decks"
 
+local temp
+
 function love.load()
     love.graphics.setBackgroundColor(62 / 255, 140 / 255, 54 / 255)
     love.graphics.setDefaultFilter("nearest", "nearest")
     cards.init()
-    decks.init()
+    temp = decks.init()
 end
 
 function love.draw()
@@ -21,7 +23,7 @@ function love.draw()
     cards.draw(cards.placeholder_homes[Suit.Clubs], 100, 10)
 
     local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
-    cards.draw_card(Suit.Diamonds, Rank.Queen, mx - CARD_WIDTH / 2, my - CARD_HEIGHT / 2)
+    cards.draw_card(temp, mx - CARD_WIDTH / 2, my - CARD_HEIGHT / 2)
 
     love.graphics.pop()
 end

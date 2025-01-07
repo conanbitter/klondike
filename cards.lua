@@ -79,12 +79,11 @@ function module.draw(item, x, y)
     love.graphics.draw(sprites, item, x, y)
 end
 
----@param suit Suit
----@param rank Rank
+---@param card Card
 ---@param x number
 ---@param y number
-function module.draw_card(suit, rank, x, y)
-    love.graphics.draw(sprites, card_quads[suit][rank], x, y)
+function module.draw_card(card, x, y)
+    love.graphics.draw(sprites, card_quads[card.suit][card.rank], x, y)
 end
 
 return module
