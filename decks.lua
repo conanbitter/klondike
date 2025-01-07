@@ -21,10 +21,10 @@ end
 ---@field y number
 ---@field cards Card[]
 ---@field placeholder love.Quad?
----@field draw function()
----@field is_empty function():boolean
----@field give function(offset number,other Deck)
----@field trygrab function(x number,y number, cursor Deck):boolean
+---@field draw fun(self:Deck)
+---@field is_empty fun(self:Deck):boolean
+---@field give fun(self:Deck, offset:number, other:Deck)
+---@field trygrab fun(self:Deck, x:number, y:number, cursor:Deck):boolean
 
 ---@param self Deck
 ---@return boolean
