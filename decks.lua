@@ -115,6 +115,56 @@ local function new_flat_deck(x, y)
     return result
 end
 
+---@class Home:Deck
+---@field suit Suit
+
+---@param self Home
+local function home_draw(self)
+    if self:is_empty() then
+        cards.draw(self.placeholder, self.x, self.y)
+    else
+        cards.draw_card(self.cards[#self.cards], self.x, self.y)
+    end
+end
+
+---@param self Home
+---@param x number
+---@param y number
+---@param cursor Deck
+---@return boolean
+local function home_trygrab(self, x, y, cursor)
+    if self:is_empty() then return false end
+    if x < self.x or
+        x > self.x + CARD_WIDTH or
+        y < self.y or
+        y >= self.y + CARD_HEIGHT then
+        return false
+    end
+    self:give(#self.cards, cursor)
+    return true
+end
+
+---@param self Home
+---@param cursor Deck
+---@return boolean
+local function home_trydrop(self, cursor)
+    return module.card_intersect(cursor.x, cursor.y, self.x, self.y) and
+        #cursor.cards == 1
+end
+
+---@param x number
+---@param y number
+---@param suit Suit
+local function new_home(x, y, suit)
+    local result = new_deck(x, y) --[[@as Home]]
+    result.suit = suit
+    result.placeholder = cards.placeholder_homes[suit]
+    result.draw = home_draw
+    result.trygrab = home_trygrab
+    result.trydrop = home_trydrop
+    return result
+end
+
 function module.init()
     local main_deck = {}
     local decks = {
@@ -150,6 +200,10 @@ function module.init()
 
     table.insert(decks.all, test_deck)
     table.insert(decks.active, test_deck)
+
+    local test_home = new_home(300, 10, Suit.Clubs)
+    table.insert(decks.all, test_home)
+    table.insert(decks.active, test_home)
 
     decks.cursor.placeholder = nil
     table.insert(decks.all, decks.cursor)
