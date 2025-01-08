@@ -249,6 +249,14 @@ local function new_reserve(x, y)
     return result
 end
 
+---@param card_list Card[]
+local function shuffle(card_list)
+    for i = 1, #card_list - 1 do
+        local r = love.math.random(i, #card_list)
+        card_list[i], card_list[r] = card_list[r], card_list[i]
+    end
+end
+
 function module.init()
     local main_deck = {}
     local decks = {
@@ -256,7 +264,7 @@ function module.init()
         homes = {},
         bases = {},
         cursor = new_flat_deck(0, 0),
-        reserve = new_reserve(10, 10),
+        reserve = new_reserve(2, 2),
         active = {},
     }
 
@@ -266,34 +274,26 @@ function module.init()
         end
     end
 
-    local test_deck = new_flat_deck(10, 100)
-    for i = 1, 10 do
-        table.insert(test_deck.cards, main_deck[#main_deck])
-        table.remove(main_deck, #main_deck)
+    shuffle(main_deck)
+
+    for i = 1, 7 do
+        local base_deck = new_flat_deck(2 + 50 * (i - 1), 70)
+        for j = 1, i do
+            table.insert(base_deck.cards, main_deck[#main_deck])
+            table.remove(main_deck, #main_deck)
+        end
+        base_deck.covered = #base_deck.cards - 1
+        table.insert(decks.all, base_deck)
+        table.insert(decks.active, base_deck)
     end
-    test_deck.covered = #test_deck.cards - 5
 
-    table.insert(decks.all, test_deck)
-    table.insert(decks.active, test_deck)
-
-    test_deck = new_flat_deck(100, 100)
-    for i = 1, 10 do
-        table.insert(test_deck.cards, main_deck[#main_deck])
-        table.remove(main_deck, #main_deck)
+    for i = 1, 4 do
+        local home_deck = new_home(152 + 50 * (i - 1), 2, i)
+        table.insert(decks.all, home_deck)
+        table.insert(decks.active, home_deck)
     end
-    test_deck.covered = #test_deck.cards - 1
 
-    table.insert(decks.all, test_deck)
-    table.insert(decks.active, test_deck)
-
-    local test_home = new_home(300, 10, Suit.Clubs)
-    table.insert(decks.all, test_home)
-    table.insert(decks.active, test_home)
-
-    for i = 1, 10 do
-        table.insert(decks.reserve.cards, main_deck[#main_deck])
-        table.remove(main_deck, #main_deck)
-    end
+    decks.reserve.cards = main_deck
     table.insert(decks.all, decks.reserve)
     table.insert(decks.active, decks.reserve)
 
