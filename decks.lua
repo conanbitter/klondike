@@ -155,6 +155,7 @@ end
 ---@param x number
 ---@param y number
 ---@param suit Suit
+---@return Home
 local function new_home(x, y, suit)
     local result = new_deck(x, y) --[[@as Home]]
     result.suit = suit
@@ -165,6 +166,89 @@ local function new_home(x, y, suit)
     return result
 end
 
+local RESERVE_OFFSET = 52
+
+---@class Reserve:Deck
+---@field index number
+---@field click fun(self:Reserve, x:number, y:number)
+
+---@param self Reserve
+local function reserve_draw(self)
+    if self:is_empty() then
+        cards.draw(self.placeholder, self.x, self.y)
+        return
+    end
+    if self.index < #self.cards then
+        cards.draw(cards.back, self.x, self.y)
+    else
+        cards.draw(self.placeholder, self.x, self.y)
+    end
+    if self.index > 0 then
+        cards.draw_card(self.cards[self.index], self.x + RESERVE_OFFSET, self.y)
+    end
+end
+
+---@param self Reserve
+---@param x number
+---@param y number
+---@param cursor Deck
+---@return boolean
+local function reserve_trygrab(self, x, y, cursor)
+    if self:is_empty() or self.index == 0 then return false end
+    if x < self.x + RESERVE_OFFSET or
+        x > self.x + CARD_WIDTH + RESERVE_OFFSET or
+        y < self.y or
+        y >= self.y + CARD_HEIGHT then
+        return false
+    end
+    table.insert(cursor.cards, self.cards[self.index])
+    table.remove(self.cards, self.index)
+    self.index = self.index - 1
+    return true
+end
+
+---@param self Reserve
+---@param cursor Deck
+---@return boolean
+local function reserve_trydrop(self, cursor)
+    return false
+end
+
+---@param self Reserve
+---@param x number
+---@param y number
+---@return boolean
+local function reserve_click(self, x, y)
+    if x < self.x or
+        x > self.x + CARD_WIDTH or
+        y < self.y or
+        y >= self.y + CARD_HEIGHT then
+        return false
+    end
+    if self:is_empty() then return true end
+
+    if self.index >= #self.cards then
+        self.index = 0
+    else
+        self.index = self.index + 1
+    end
+    return true
+end
+
+---@param x number
+---@param y number
+---@return Reserve
+local function new_reserve(x, y)
+    local result = new_deck(x, y) --[[@as Reserve]]
+    result.index = 0
+    result.placeholder = cards.placeholder_refresh
+    result.draw = reserve_draw
+    result.trygrab = reserve_trygrab
+    result.trydrop = reserve_trydrop
+    result.click = reserve_click
+    return result
+end
+
 function module.init()
     local main_deck = {}
     local decks = {
@@ -172,6 +256,7 @@ function module.init()
         homes = {},
         bases = {},
         cursor = new_flat_deck(0, 0),
+        reserve = new_reserve(10, 10),
         active = {},
     }
 
@@ -181,7 +266,7 @@ function module.init()
         end
     end
 
-    local test_deck = new_flat_deck(10, 10)
+    local test_deck = new_flat_deck(10, 100)
     for i = 1, 10 do
         table.insert(test_deck.cards, main_deck[#main_deck])
         table.remove(main_deck, #main_deck)
@@ -191,7 +276,7 @@ function module.init()
     table.insert(decks.all, test_deck)
     table.insert(decks.active, test_deck)
 
-    test_deck = new_flat_deck(100, 10)
+    test_deck = new_flat_deck(100, 100)
     for i = 1, 10 do
         table.insert(test_deck.cards, main_deck[#main_deck])
         table.remove(main_deck, #main_deck)
@@ -204,6 +289,13 @@ function module.init()
     local test_home = new_home(300, 10, Suit.Clubs)
     table.insert(decks.all, test_home)
     table.insert(decks.active, test_home)
+
+    for i = 1, 10 do
+        table.insert(decks.reserve.cards, main_deck[#main_deck])
+        table.remove(main_deck, #main_deck)
+    end
+    table.insert(decks.all, decks.reserve)
+    table.insert(decks.active, decks.reserve)
 
     decks.cursor.placeholder = nil
     table.insert(decks.all, decks.cursor)

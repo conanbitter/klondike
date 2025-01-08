@@ -48,6 +48,9 @@ function love.mousepressed(x, y, button, istouch, presses)
     local mx, my = screen_transform:inverseTransformPoint(x, y)
     mx = math.floor(mx)
     my = math.floor(my)
+
+    if deck_list.reserve:click(mx, my) then return end
+
     for _, deck in ipairs(deck_list.active) do
         if deck:trygrab(mx, my, deck_list.cursor) then
             old_place = deck
