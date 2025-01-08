@@ -288,8 +288,7 @@ function module.init()
     for i = 1, 7 do
         local base_deck = new_flat_deck(2 + 50 * (i - 1), 70)
         for j = 1, i do
-            table.insert(base_deck.cards, main_deck[#main_deck])
-            table.remove(main_deck, #main_deck)
+            table.insert(base_deck.cards, table.remove(main_deck))
         end
         base_deck.covered = #base_deck.cards - 1
         table.insert(decks.all, base_deck)
