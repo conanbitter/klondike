@@ -97,4 +97,29 @@ function module.suit_compatible(suit1, suit2)
     end
 end
 
+---@param src Card[]
+---@param dst Card[]
+---@param from number
+function module.move_cards(src, dst, from)
+    for i = from, #src do
+        table.insert(dst, src[i])
+        src[i] = nil
+    end
+end
+
+---@param src Card[]
+---@param src_pos ?number
+---@param dst Card[]
+---@param dst_pos ?number
+function module.move_single_card(src, src_pos, dst, dst_pos)
+    if dst == nil and type(src_pos) == "table" then
+        dst = src_pos
+        src_pos = nil
+    end
+    if src_pos == nil then src_pos = #src end
+    if dst_pos == nil then dst_pos = #dst end
+    table.insert(dst, dst_pos, src[src_pos])
+    table.remove(src, src_pos)
+end
+
 return module
