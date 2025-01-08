@@ -86,4 +86,15 @@ function module.draw_card(card, x, y)
     love.graphics.draw(sprites, card_quads[card.suit][card.rank], x, y)
 end
 
+---@param suit1 Suit
+---@param suit2 Suit
+---@return boolean
+function module.suit_compatible(suit1, suit2)
+    if suit1 == Suit.Clubs or suit1 == Suit.Spades then
+        return suit2 == Suit.Hearts or suit2 == Suit.Diamonds
+    else
+        return suit2 == Suit.Clubs or suit2 == Suit.Spades
+    end
+end
+
 return module

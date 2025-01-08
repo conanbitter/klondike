@@ -100,7 +100,10 @@ end
 local function trydrop_flat(self, cursor)
     local offset = (#self.cards - 1) * FLAT_OFFSET
     if offset < 0 then offset = 0 end
-    return module.card_intersect(cursor.x, cursor.y, self.x, self.y + offset)
+    if not module.card_intersect(cursor.x, cursor.y, self.x, self.y + offset) then return false end
+    if self:is_empty() then return true end
+    return cards.suit_compatible(self.cards[#self.cards].suit, cursor.cards[1].suit) and
+        self.cards[#self.cards].rank - cursor.cards[1].rank == 1
 end
 
 ---@param x number
@@ -148,8 +151,14 @@ end
 ---@param cursor Deck
 ---@return boolean
 local function home_trydrop(self, cursor)
+    local rank = 1
+    if not self:is_empty() then
+        rank = self.cards[#self.cards].rank + 1
+    end
     return module.card_intersect(cursor.x, cursor.y, self.x, self.y) and
-        #cursor.cards == 1
+        #cursor.cards == 1 and
+        cursor.cards[1].suit == self.suit and
+        cursor.cards[1].rank == rank
 end
 
 ---@param x number

@@ -60,6 +60,8 @@ function love.mousepressed(x, y, button, istouch, presses)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
+    --TODO fix fallback for Reserve
+    if deck_list.cursor:is_empty() then return end
     for _, deck in ipairs(deck_list.active) do
         if deck:trydrop(deck_list.cursor) then
             deck_list.cursor:give(1, deck)
@@ -70,7 +72,7 @@ function love.mousereleased(x, y, button, istouch, presses)
             return
         end
     end
-    if not deck_list.cursor:is_empty() and old_place then
+    if old_place then
         deck_list.cursor:give(1, old_place)
     end
 end
