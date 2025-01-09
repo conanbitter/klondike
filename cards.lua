@@ -118,22 +118,20 @@ function module.move_multiple(src, dst, from)
 end
 
 ---@param src Card[]
----@param src_pos number|Card[]
----@param dst ?Card[]
+---@param src_pos number
+---@param dst Card[]
 ---@param dst_pos ?number
+---@overload fun(src:Card[], dst:Card[])
 function module.move_single(src, src_pos, dst, dst_pos)
     if dst == nil and type(src_pos) == "table" then
-        dst = src_pos
+        dst = src_pos --[=[@as Card[]]=]
         src_pos = #src
     end
-    ---@cast dst Card[]
     if dst_pos == nil then
         table.insert(dst, src[src_pos])
     else
         table.insert(dst, dst_pos, src[src_pos])
     end
-
-    ---@cast src_pos number
     table.remove(src, src_pos)
 end
 
