@@ -109,26 +109,31 @@ end
 
 ---@param src Card[]
 ---@param dst Card[]
----@param from number
+---@param from ?number
 function module.move_multiple(src, dst, from)
-    for i = from, #src do
+    for i = from or 1, #src do
         table.insert(dst, src[i])
         src[i] = nil
     end
 end
 
 ---@param src Card[]
----@param src_pos ?number
----@param dst Card[]
+---@param src_pos number|Card[]
+---@param dst ?Card[]
 ---@param dst_pos ?number
 function module.move_single(src, src_pos, dst, dst_pos)
     if dst == nil and type(src_pos) == "table" then
         dst = src_pos
-        src_pos = nil
+        src_pos = #src
     end
-    if src_pos == nil then src_pos = #src end
-    if dst_pos == nil then dst_pos = #dst end
-    table.insert(dst, dst_pos, src[src_pos])
+    ---@cast dst Card[]
+    if dst_pos == nil then
+        table.insert(dst, src[src_pos])
+    else
+        table.insert(dst, dst_pos, src[src_pos])
+    end
+
+    ---@cast src_pos number
     table.remove(src, src_pos)
 end
 

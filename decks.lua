@@ -16,6 +16,18 @@ local function new_card(suit, rank)
     }
 end
 
+---@param x1 number
+---@param y1 number
+---@param x2 number
+---@param y2 number
+---@return boolean
+local function card_intersect(x1, y1, x2, y2)
+    return x1 - x2 <= CARD_WIDTH and
+        x2 - x1 <= CARD_WIDTH and
+        y1 - y2 <= CARD_HEIGHT and
+        y2 - y1 <= CARD_HEIGHT
+end
+
 ---@class Deck
 ---@field x number
 ---@field y number
@@ -23,24 +35,13 @@ end
 ---@field placeholder love.Quad?
 ---@field draw fun(self:Deck)
 ---@field is_empty fun(self:Deck):boolean
----@field give fun(self:Deck, offset:number, other:Deck)
----@field trygrab fun(self:Deck, x:number, y:number, cursor:Deck):boolean
----@field trydrop fun(self:Deck, cursor:Deck):boolean
+---@field trygrab fun(self:Deck, x:number, y:number, hand:Card[]):boolean
+---@field trydrop fun(self:Deck, x:number, y:number, hand:Card[]):boolean
 
 ---@param self Deck
 ---@return boolean
 local function desk_is_empty(self)
     return #self.cards == 0
-end
-
----@param self Deck
----@param offset number
----@param other Deck
-local function desk_give(self, offset, other)
-    for i = offset, #self.cards do
-        table.insert(other.cards, self.cards[i])
-        self.cards[i] = nil
-    end
 end
 
 ---@param x number
@@ -54,7 +55,6 @@ local function new_deck(x, y)
         placeholder = cards.placeholder_empty,
         draw = nil,
         is_empty = desk_is_empty,
-        give = desk_give,
         trygrab = nil,
         trydrop = nil,
     }
@@ -80,28 +80,30 @@ end
 ---@param self FlatDeck
 ---@param x number
 ---@param y number
----@param cursor Deck
+---@param hand Card[]
 ---@return boolean
-local function trygrab_flat(self, x, y, cursor)
+local function trygrab_flat(self, x, y, hand)
     if self:is_empty() then return false end
     if x < self.x or x > self.x + CARD_WIDTH then return false end
     if y < self.y + self.covered * FLAT_OFFSET or y >= self.y + CARD_HEIGHT + (#self.cards - 1) * FLAT_OFFSET then return false end
     local index = math.floor((y - self.y) / FLAT_OFFSET) + 1
     if index > #self.cards then index = #self.cards end
-    self:give(index, cursor)
+    cards.move_multiple(self.cards, hand, index)
     return true
 end
 
 ---@param self FlatDeck
----@param cursor Deck
+---@param x number
+---@param y number
+---@param hand Card[]
 ---@return boolean
-local function trydrop_flat(self, cursor)
+local function trydrop_flat(self, x, y, hand)
     local offset = (#self.cards - 1) * FLAT_OFFSET
     if offset < 0 then offset = 0 end
-    if not module.card_intersect(cursor.x, cursor.y, self.x, self.y + offset) then return false end
+    if not card_intersect(x, y, self.x, self.y + offset) then return false end
     if self:is_empty() then return true end
-    return cards.suit_compatible(self.cards[#self.cards].suit, cursor.cards[1].suit) and
-        self.cards[#self.cards].rank - cursor.cards[1].rank == 1
+    return cards.suit_compatible(self.cards[#self.cards].suit, hand[1].suit) and
+        self.cards[#self.cards].rank - hand[1].rank == 1
 end
 
 ---@param x number
@@ -131,9 +133,9 @@ end
 ---@param self Home
 ---@param x number
 ---@param y number
----@param cursor Deck
+---@param hand Card[]
 ---@return boolean
-local function home_trygrab(self, x, y, cursor)
+local function home_trygrab(self, x, y, hand)
     if self:is_empty() then return false end
     if x < self.x or
         x > self.x + CARD_WIDTH or
@@ -141,22 +143,24 @@ local function home_trygrab(self, x, y, cursor)
         y >= self.y + CARD_HEIGHT then
         return false
     end
-    self:give(#self.cards, cursor)
+    cards.move_single(self.cards, hand)
     return true
 end
 
 ---@param self Home
----@param cursor Deck
+---@param x number
+---@param y number
+---@param hand Card[]
 ---@return boolean
-local function home_trydrop(self, cursor)
+local function home_trydrop(self, x, y, hand)
     local rank = 1
     if not self:is_empty() then
         rank = self.cards[#self.cards].rank + 1
     end
-    return module.card_intersect(cursor.x, cursor.y, self.x, self.y) and
-        #cursor.cards == 1 and
-        cursor.cards[1].suit == self.suit and
-        cursor.cards[1].rank == rank
+    return card_intersect(x, y, self.x, self.y) and
+        #hand == 1 and
+        hand[1].suit == self.suit and
+        hand[1].rank == rank
 end
 
 ---@param x number
@@ -198,9 +202,9 @@ end
 ---@param self Reserve
 ---@param x number
 ---@param y number
----@param cursor Deck
+---@param hand Card[]
 ---@return boolean
-local function reserve_trygrab(self, x, y, cursor)
+local function reserve_trygrab(self, x, y, hand)
     if self:is_empty() or self.index == 0 then return false end
     if x < self.x + RESERVE_OFFSET or
         x > self.x + CARD_WIDTH + RESERVE_OFFSET or
@@ -208,16 +212,17 @@ local function reserve_trygrab(self, x, y, cursor)
         y >= self.y + CARD_HEIGHT then
         return false
     end
-    table.insert(cursor.cards, self.cards[self.index])
-    table.remove(self.cards, self.index)
+    cards.move_single(self.cards, self.index, hand)
     self.index = self.index - 1
     return true
 end
 
 ---@param self Reserve
----@param cursor Deck
+---@param x number
+---@param y number
+---@param hand Card[]
 ---@return boolean
-local function reserve_trydrop(self, cursor)
+local function reserve_trydrop(self, x, y, hand)
     return false
 end
 
@@ -264,16 +269,11 @@ local function shuffle(card_list)
     end
 end
 
+---@return Deck[], Reserve
 function module.init()
     local main_deck = {}
-    local decks = {
-        all = {},
-        homes = {},
-        bases = {},
-        cursor = new_flat_deck(0, 0),
-        reserve = new_reserve(2, 2),
-        active = {},
-    }
+    local reserve = new_reserve(2, 2)
+    local decks = { reserve }
 
     for suit = 1, 4 do
         for rank = 1, 13 do
@@ -289,36 +289,17 @@ function module.init()
             table.insert(base_deck.cards, table.remove(main_deck))
         end
         base_deck.covered = #base_deck.cards - 1
-        table.insert(decks.all, base_deck)
-        table.insert(decks.active, base_deck)
+        table.insert(decks, base_deck)
     end
 
     for i = 1, 4 do
         local home_deck = new_home(152 + 50 * (i - 1), 2, i)
-        table.insert(decks.all, home_deck)
-        table.insert(decks.active, home_deck)
+        table.insert(decks, home_deck)
     end
 
-    decks.reserve.cards = main_deck
-    table.insert(decks.all, decks.reserve)
-    table.insert(decks.active, decks.reserve)
+    reserve.cards = main_deck
 
-    decks.cursor.placeholder = nil
-    table.insert(decks.all, decks.cursor)
-
-    return decks
-end
-
----@param x1 number
----@param y1 number
----@param x2 number
----@param y2 number
----@return boolean
-function module.card_intersect(x1, y1, x2, y2)
-    return x1 - x2 <= CARD_WIDTH and
-        x2 - x1 <= CARD_WIDTH and
-        y1 - y2 <= CARD_HEIGHT and
-        y2 - y1 <= CARD_HEIGHT
+    return decks, reserve
 end
 
 return module

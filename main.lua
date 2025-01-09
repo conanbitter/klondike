@@ -5,7 +5,16 @@ end
 local cards = require "cards"
 local decks = require "decks"
 
-local deck_list
+---@type Deck[]
+local all_decks
+---@type Reserve
+local reserve
+---@type Card[]
+local hand = {}
+---@type number
+local hand_x = 0
+---@type number
+local hand_y = 0
 ---@type Deck?
 local old_place = nil
 
@@ -15,19 +24,19 @@ function love.load()
     love.graphics.setBackgroundColor(62 / 255, 140 / 255, 54 / 255)
     love.graphics.setDefaultFilter("nearest", "nearest")
     cards.init()
-    deck_list = decks.init()
+    all_decks, reserve = decks.init()
 
     screen_transform:scale(3, 3)
 end
 
 function love.update(dt)
-    if not deck_list.cursor:is_empty() then
+    if #hand > 0 then
         local mx, my = screen_transform:inverseTransformPoint(love.mouse.getPosition())
-        deck_list.cursor.x = mx - CARD_WIDTH / 2;
-        if #deck_list.cursor.cards == 1 then
-            deck_list.cursor.y = my - CARD_HEIGHT / 2;
+        hand_x = math.floor(mx - CARD_WIDTH / 2);
+        if #hand == 1 then
+            hand_y = math.floor(my - CARD_HEIGHT / 2);
         else
-            deck_list.cursor.y = my - FLAT_OFFSET / 2;
+            hand_y = math.floor(my - FLAT_OFFSET / 2);
         end
     end
 end
@@ -37,8 +46,12 @@ function love.draw()
     love.graphics.push()
     love.graphics.applyTransform(screen_transform)
 
-    for _, deck in ipairs(deck_list.all) do
+    for _, deck in ipairs(all_decks) do
         deck:draw()
+    end
+
+    if #hand > 0 then
+        cards.draw_multiple(hand, hand_x, hand_y)
     end
 
     love.graphics.pop()
@@ -49,10 +62,10 @@ function love.mousepressed(x, y, button, istouch, presses)
     mx = math.floor(mx)
     my = math.floor(my)
 
-    if deck_list.reserve:click(mx, my) then return end
+    if reserve:click(mx, my) then return end
 
-    for _, deck in ipairs(deck_list.active) do
-        if deck:trygrab(mx, my, deck_list.cursor) then
+    for _, deck in ipairs(all_decks) do
+        if deck:trygrab(mx, my, hand) then
             old_place = deck
             break
         end
@@ -61,10 +74,10 @@ end
 
 function love.mousereleased(x, y, button, istouch, presses)
     --TODO fix fallback for Reserve
-    if deck_list.cursor:is_empty() then return end
-    for _, deck in ipairs(deck_list.active) do
-        if deck:trydrop(deck_list.cursor) then
-            deck_list.cursor:give(1, deck)
+    if #hand == 0 then return end
+    for _, deck in ipairs(all_decks) do
+        if deck:trydrop(hand_x, hand_y, hand) then
+            cards.move_multiple(hand, deck.cards)
             ---@cast old_place FlatDeck
             if old_place ~= deck and old_place.covered ~= nil and old_place.covered >= #old_place.cards then
                 old_place.covered = #old_place.cards - 1
@@ -73,6 +86,6 @@ function love.mousereleased(x, y, button, istouch, presses)
         end
     end
     if old_place then
-        deck_list.cursor:give(1, old_place)
+        cards.move_multiple(hand, old_place.cards)
     end
 end
