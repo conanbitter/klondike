@@ -60,21 +60,19 @@ local function new_deck(x, y)
     }
 end
 
-_G.FLAT_OFFSET = 14
-
 ---@class FlatDeck:Deck
 ---@field covered number
 
 ---@param self FlatDeck
 local function draw_flat(self)
     if self:is_empty() and self.placeholder then
-        cards.draw(self.placeholder, self.x, self.y)
+        cards.draw_other(self.placeholder, self.x, self.y)
     end
     for i, card in ipairs(self.cards) do
         if i <= self.covered then
-            cards.draw(cards.back, self.x, self.y + (i - 1) * FLAT_OFFSET)
+            cards.draw_other(cards.back, self.x, self.y + (i - 1) * FLAT_OFFSET)
         else
-            cards.draw_card(card, self.x, self.y + (i - 1) * FLAT_OFFSET)
+            cards.draw_single(card, self.x, self.y + (i - 1) * FLAT_OFFSET)
         end
     end
 end
@@ -124,9 +122,9 @@ end
 ---@param self Home
 local function home_draw(self)
     if self:is_empty() then
-        cards.draw(self.placeholder, self.x, self.y)
+        cards.draw_other(self.placeholder, self.x, self.y)
     else
-        cards.draw_card(self.cards[#self.cards], self.x, self.y)
+        cards.draw_single(self.cards[#self.cards], self.x, self.y)
     end
 end
 
@@ -184,16 +182,16 @@ local RESERVE_OFFSET = 52
 ---@param self Reserve
 local function reserve_draw(self)
     if self:is_empty() then
-        cards.draw(self.placeholder, self.x, self.y)
+        cards.draw_other(self.placeholder, self.x, self.y)
         return
     end
     if self.index < #self.cards then
-        cards.draw(cards.back, self.x, self.y)
+        cards.draw_other(cards.back, self.x, self.y)
     else
-        cards.draw(self.placeholder, self.x, self.y)
+        cards.draw_other(self.placeholder, self.x, self.y)
     end
     if self.index > 0 then
-        cards.draw_card(self.cards[self.index], self.x + RESERVE_OFFSET, self.y)
+        cards.draw_single(self.cards[self.index], self.x + RESERVE_OFFSET, self.y)
     end
 end
 

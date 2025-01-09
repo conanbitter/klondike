@@ -2,6 +2,7 @@ local module = {}
 
 _G.CARD_WIDTH = 42
 _G.CARD_HEIGHT = 60
+_G.FLAT_OFFSET = 14
 
 ---@enum Suit
 _G.Suit = {
@@ -75,15 +76,24 @@ end
 ---@param item love.Quad
 ---@param x number
 ---@param y number
-function module.draw(item, x, y)
+function module.draw_other(item, x, y)
     love.graphics.draw(sprites, item, x, y)
 end
 
 ---@param card Card
 ---@param x number
 ---@param y number
-function module.draw_card(card, x, y)
+function module.draw_single(card, x, y)
     love.graphics.draw(sprites, card_quads[card.suit][card.rank], x, y)
+end
+
+---@param cards Card[]
+---@param x number
+---@param y number
+function module.draw_multiple(cards, x, y)
+    for i, card in ipairs(cards) do
+        module.draw_single(card, x, y + (i - 1) * FLAT_OFFSET)
+    end
 end
 
 ---@param suit1 Suit
@@ -100,7 +110,7 @@ end
 ---@param src Card[]
 ---@param dst Card[]
 ---@param from number
-function module.move_cards(src, dst, from)
+function module.move_multiple(src, dst, from)
     for i = from, #src do
         table.insert(dst, src[i])
         src[i] = nil
@@ -111,7 +121,7 @@ end
 ---@param src_pos ?number
 ---@param dst Card[]
 ---@param dst_pos ?number
-function module.move_single_card(src, src_pos, dst, dst_pos)
+function module.move_single(src, src_pos, dst, dst_pos)
     if dst == nil and type(src_pos) == "table" then
         dst = src_pos
         src_pos = nil
