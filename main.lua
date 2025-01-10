@@ -9,6 +9,8 @@ local decks = require "decks"
 local all_decks
 ---@type Reserve
 local reserve
+---@type Home[]
+local homes
 ---@type Card[]
 local hand = {}
 ---@type number
@@ -18,13 +20,18 @@ local hand_y = 0
 ---@type Deck?
 local old_place = nil
 
+---@type number?
+local since_last_mousedown = nil
+
 local screen_transform = love.math.newTransform()
+
+_G.DOUBLE_CLICK_TIME = 0.3
 
 function love.load()
     love.graphics.setBackgroundColor(62 / 255, 140 / 255, 54 / 255)
     love.graphics.setDefaultFilter("nearest", "nearest")
     cards.init()
-    all_decks, reserve = decks.init()
+    all_decks, reserve, homes = decks.init()
 
     screen_transform:scale(3, 3)
 end
@@ -69,6 +76,26 @@ function love.mousepressed(x, y, button, istouch, presses)
             old_place = deck
             break
         end
+    end
+
+    if since_last_mousedown and
+        love.timer.getTime() - since_last_mousedown < DOUBLE_CLICK_TIME and
+        #hand == 1 then
+        local home = homes[hand[1].suit]
+        if (home:is_empty() and hand[1].rank == Rank.Ace) or
+            (hand[1].rank == home.cards[#home.cards].rank + 1) then
+            cards.move_single(hand, home.cards)
+            ---@cast old_place FlatDeck
+            if old_place and old_place.covered ~= nil and old_place.covered >= #old_place.cards then
+                old_place.covered = #old_place.cards - 1
+            end
+        end
+        since_last_mousedown = nil
+    else
+        --[[if since_last_mousedown then
+            print(love.timer.getTime() - since_last_mousedown)
+        end]]
+        since_last_mousedown = love.timer.getTime()
     end
 end
 

@@ -285,11 +285,12 @@ local function shuffle(card_list)
     end
 end
 
----@return Deck[], Reserve
+---@return Deck[], Reserve, Home[]
 function module.init()
     local main_deck = {}
     local reserve = new_reserve(2, 2)
     local decks = { reserve }
+    local homes = {}
 
     for suit = 1, 4 do
         for rank = 1, 13 do
@@ -311,11 +312,12 @@ function module.init()
     for i = 1, 4 do
         local home_deck = new_home(152 + 50 * (i - 1), 2, i)
         table.insert(decks, home_deck)
+        homes[i] = home_deck
     end
 
     reserve.cards = main_deck
 
-    return decks, reserve
+    return decks, reserve, homes
 end
 
 return module
