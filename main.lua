@@ -86,6 +86,6 @@ function love.mousereleased(x, y, button, istouch, presses)
         end
     end
     if old_place then
-        cards.move_multiple(hand, old_place.cards)
+        old_place:revert_drop(hand)
     end
 end

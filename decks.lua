@@ -37,11 +37,18 @@ end
 ---@field is_empty fun(self:Deck):boolean
 ---@field trygrab fun(self:Deck, x:number, y:number, hand:Card[]):boolean
 ---@field trydrop fun(self:Deck, x:number, y:number, hand:Card[]):boolean
+---@field revert_drop fun(self:Deck, hand:Card[])
 
 ---@param self Deck
 ---@return boolean
 local function desk_is_empty(self)
     return #self.cards == 0
+end
+
+---@param self Deck
+---@param hand Card[]
+local function deck_revert_drop(self, hand)
+    cards.move_multiple(hand, self.cards)
 end
 
 ---@param x number
@@ -57,6 +64,7 @@ local function new_deck(x, y)
         is_empty = desk_is_empty,
         trygrab = nil,
         trydrop = nil,
+        revert_drop = deck_revert_drop
     }
 end
 
@@ -227,6 +235,13 @@ local function reserve_trydrop(self, x, y, hand)
 end
 
 ---@param self Reserve
+---@param hand Card[]
+local function reserve_revert_drop(self, hand)
+    self.index = self.index + 1
+    cards.move_single(hand, 1, self.cards, self.index)
+end
+
+---@param self Reserve
 ---@param x number
 ---@param y number
 ---@return boolean
@@ -257,6 +272,7 @@ local function new_reserve(x, y)
     result.draw = reserve_draw
     result.trygrab = reserve_trygrab
     result.trydrop = reserve_trydrop
+    result.revert_drop = reserve_revert_drop
     result.click = reserve_click
     return result
 end
