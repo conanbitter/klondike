@@ -4,7 +4,13 @@ build_directory = "makelove-build"
 love_version = "11.5"
 icon_file = "icon.ico"
 
-love_files = ["::git-ls-tree::", "-*/.*", "-./readme.md", "-./icon.ico"]
+love_files = [
+    "::git-ls-tree::",
+    "-*/.*",
+    "-./readme.md",
+    "-./icon.ico",
+    "-./makelove.toml",
+]
 
 [archive_files]
-"../love2d/license.txt" = "license.txt"
+"./lib/licenses" = "licenses"
