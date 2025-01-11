@@ -3,7 +3,7 @@ local module = {}
 ---@class Vector
 ---@field x number
 ---@field y number
----@field distance2 fun():number
+---@field distance2 fun(self: Vector, other: Vector):number
 
 ---comment
 ---@param self Vector

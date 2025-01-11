@@ -4,6 +4,7 @@ end
 
 local cards = require "cards"
 local decks = require "decks"
+local vector = require "vector"
 
 ---@type Deck[]
 local all_decks
@@ -83,7 +84,7 @@ function love.mousepressed(x, y, button, istouch, presses)
         #hand == 1 then
         local home = homes[hand[1].suit]
         if (home:is_empty() and hand[1].rank == Rank.Ace) or
-            (hand[1].rank == home.cards[#home.cards].rank + 1) then
+            (not home:is_empty() and hand[1].rank == home.cards[#home.cards].rank + 1) then
             cards.move_single(hand, home.cards)
             ---@cast old_place FlatDeck
             if old_place and old_place.covered ~= nil and old_place.covered >= #old_place.cards then
@@ -102,11 +103,25 @@ end
 function love.mousereleased(x, y, button, istouch, presses)
     --TODO fix fallback for Reserve
     if #hand == 0 then return end
+    ---@type Deck?
+    local candidate = nil
+    local distance = 1.0e10
+    local hand_pos = vector.new_vector(hand_x, hand_y)
     for _, deck in ipairs(all_decks) do
-        if deck:trydrop(hand_x, hand_y, hand) then
-            cards.move_multiple(hand, deck.cards)
+        local deck_pos = deck:candrop(hand_x, hand_y)
+        if deck_pos then
+            local deck_distance = hand_pos:distance2(deck_pos)
+            if deck_distance < distance then
+                candidate = deck
+                distance = deck_distance
+            end
+        end
+    end
+    if candidate then
+        if candidate:trydrop(hand_x, hand_y, hand) then
+            cards.move_multiple(hand, candidate.cards)
             ---@cast old_place FlatDeck
-            if old_place ~= deck and old_place.covered ~= nil and old_place.covered >= #old_place.cards then
+            if old_place ~= candidate and old_place.covered ~= nil and old_place.covered >= #old_place.cards then
                 old_place.covered = #old_place.cards - 1
             end
             return

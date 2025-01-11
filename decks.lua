@@ -1,6 +1,7 @@
 local module = {}
 
 local cards = require "cards"
+local vector = require "vector"
 
 ---@class Card
 ---@field suit Suit
@@ -36,6 +37,7 @@ end
 ---@field draw fun(self:Deck)
 ---@field is_empty fun(self:Deck):boolean
 ---@field trygrab fun(self:Deck, x:number, y:number, hand:Card[]):boolean
+---@field candrop fun(self:Deck, x:number, y:number):Vector?
 ---@field trydrop fun(self:Deck, x:number, y:number, hand:Card[]):boolean
 ---@field revert_drop fun(self:Deck, hand:Card[])
 
@@ -62,6 +64,7 @@ local function new_deck(x, y)
         placeholder = cards.placeholder_empty,
         draw = nil,
         is_empty = desk_is_empty,
+        cangrab = nil,
         trygrab = nil,
         trydrop = nil,
         revert_drop = deck_revert_drop
@@ -103,6 +106,20 @@ end
 ---@param self FlatDeck
 ---@param x number
 ---@param y number
+---@return Vector?
+local function candrop_flat(self, x, y)
+    local offset = (#self.cards - 1) * FLAT_OFFSET
+    if offset < 0 then offset = 0 end
+    if card_intersect(x, y, self.x, self.y + offset) then
+        return vector.new_vector(self.x, self.y + offset)
+    else
+        return nil
+    end
+end
+
+---@param self FlatDeck
+---@param x number
+---@param y number
 ---@param hand Card[]
 ---@return boolean
 local function trydrop_flat(self, x, y, hand)
@@ -122,6 +139,7 @@ local function new_flat_deck(x, y)
     result.covered = 0
     result.draw = draw_flat
     result.trygrab = trygrab_flat
+    result.candrop = candrop_flat
     result.trydrop = trydrop_flat
     return result
 end
@@ -158,6 +176,18 @@ end
 ---@param self Home
 ---@param x number
 ---@param y number
+---@return Vector?
+local function home_candrop(self, x, y)
+    if card_intersect(x, y, self.x, self.y) then
+        return vector.new_vector(self.x, self.y)
+    else
+        return nil
+    end
+end
+
+---@param self Home
+---@param x number
+---@param y number
 ---@param hand Card[]
 ---@return boolean
 local function home_trydrop(self, x, y, hand)
@@ -181,6 +211,7 @@ local function new_home(x, y, suit)
     result.placeholder = cards.placeholder_homes[suit]
     result.draw = home_draw
     result.trygrab = home_trygrab
+    result.candrop = home_candrop
     result.trydrop = home_trydrop
     return result
 end
@@ -223,6 +254,20 @@ local function reserve_trygrab(self, x, y, hand)
     cards.move_single(self.cards, self.index, hand)
     self.index = self.index - 1
     return true
+end
+
+---@param self Reserve
+---@param x number
+---@param y number
+---@return Vector?
+local function reserve_candrop(self, x, y)
+    if card_intersect(x, y, self.x, self.y) then
+        return vector.new_vector(self.x, self.y)
+    elseif card_intersect(x, y, self.x + RESERVE_OFFSET, self.y) then
+        return vector.new_vector(self.x + RESERVE_OFFSET, self.y)
+    else
+        return nil
+    end
 end
 
 ---@param self Reserve
@@ -271,6 +316,7 @@ local function new_reserve(x, y)
     result.placeholder = cards.placeholder_refresh
     result.draw = reserve_draw
     result.trygrab = reserve_trygrab
+    result.candrop = reserve_candrop
     result.trydrop = reserve_trydrop
     result.revert_drop = reserve_revert_drop
     result.click = reserve_click
