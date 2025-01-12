@@ -1,10 +1,15 @@
+---@class Object
+---@field extend fun():any
+---@field is fun(class:Object)
+---@field implement fun(class:Object)
+
 local Object = require "lib.classic"
 local vector = require "vector"
 
 ---@type love.Image
 local ui_texture
 
----@class UIElement
+---@class UIElement: Object
 ---@field x number
 ---@field y number
 ---@field width number
@@ -16,7 +21,7 @@ local ui_texture
 ---@field on_mouse_move fun(self:UIElement, x:number, y:number)
 ---@field on_mouse_down fun(self:UIElement, x:number, y:number):boolean
 ---@field on_mouse_up fun(self:UIElement, x:number, y:number)
----@overload fun(x:number, y:number, width:number, height:number, faces:Vector[])
+---@overload fun(x:number, y:number, width:number, height:number, faces:Vector[]):UIElement
 local UIElement = Object:extend()
 
 ---@param x number
@@ -52,13 +57,35 @@ end
 
 function UIElement:on_mouse_up(x, y) end
 
+---@class Button: UIElement
+local Button = UIElement:extend()
+
+function Button:on_mouse_move(x, y)
+    if self:is_inside(x, y) then
+        self.state = 2
+    else
+        self.state = 1
+    end
+    --print(self.state)
+end
+
+function Button:on_mouse_up(x, y)
+    if self:is_inside(x, y) then
+        print "Button"
+    end
+end
+
 local module = {}
 
 function module.init()
     ui_texture = love.graphics.newImage("ui.png")
     return {
         game = {
-            UIElement(107, 2, 31, 31, { vector.new_vector(170, 33) })
+            Button(107, 2, 31, 31, {
+                vector.new_vector(170, 1),
+                vector.new_vector(170, 33),
+                vector.new_vector(170, 65),
+            })
         }
     }
 end

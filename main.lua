@@ -109,8 +109,23 @@ function love.mousepressed(x, y, button, istouch, presses)
     end
 end
 
+function love.mousemoved(x, y, dx, dy, istouch)
+    local mx, my = screen_transform:inverseTransformPoint(x, y)
+    mx = math.floor(mx)
+    my = math.floor(my)
+    for _, elt in ipairs(ui_layouts.game) do
+        elt:on_mouse_move(mx, my)
+    end
+end
+
 function love.mousereleased(x, y, button, istouch, presses)
-    --TODO fix fallback for Reserve
+    local mx, my = screen_transform:inverseTransformPoint(x, y)
+    mx = math.floor(mx)
+    my = math.floor(my)
+    for _, elt in ipairs(ui_layouts.game) do
+        elt:on_mouse_up(mx, my)
+    end
+
     if #hand == 0 then return end
     ---@type Deck?
     local candidate = nil
