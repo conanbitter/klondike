@@ -5,6 +5,7 @@ end
 local cards = require "cards"
 local decks = require "decks"
 local vector = require "vector"
+local ui = require "ui"
 
 ---@type Deck[]
 local all_decks
@@ -26,6 +27,9 @@ local since_last_mousedown = nil
 
 local screen_transform = love.math.newTransform()
 
+---@type { [string]:UIElement[] }
+local ui_layouts
+
 _G.DOUBLE_CLICK_TIME = 0.3
 
 function love.load()
@@ -33,6 +37,7 @@ function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
     cards.init()
     all_decks, reserve, homes = decks.init()
+    ui_layouts = ui.init()
 
     screen_transform:scale(3, 3)
 end
@@ -53,6 +58,10 @@ function love.draw()
     -- scaling
     love.graphics.push()
     love.graphics.applyTransform(screen_transform)
+
+    for _, elt in ipairs(ui_layouts.game) do
+        elt:draw()
+    end
 
     for _, deck in ipairs(all_decks) do
         deck:draw()

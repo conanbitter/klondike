@@ -1,4 +1,5 @@
 local Object = require "lib.classic"
+local vector = require "vector"
 
 ---@type love.Image
 local ui_texture
@@ -50,3 +51,16 @@ function UIElement:on_mouse_down(x, y)
 end
 
 function UIElement:on_mouse_up(x, y) end
+
+local module = {}
+
+function module.init()
+    ui_texture = love.graphics.newImage("ui.png")
+    return {
+        game = {
+            UIElement(107, 2, 31, 31, { vector.new_vector(170, 33) })
+        }
+    }
+end
+
+return module
