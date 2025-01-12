@@ -1,8 +1,3 @@
----@class Object
----@field extend fun():any
----@field is fun(class:Object)
----@field implement fun(class:Object)
-
 local Object = require "lib.classic"
 local vector = require "vector"
 
@@ -72,6 +67,15 @@ end
 function Button:on_mouse_up(x, y)
     if self:is_inside(x, y) then
         print "Button"
+        self.state = 2
+    else
+        self.state = 1
+    end
+end
+
+function Button:on_mouse_down(x, y)
+    if self:is_inside(x, y) then
+        self.state = 3
     end
 end
 

@@ -78,6 +78,9 @@ function love.mousepressed(x, y, button, istouch, presses)
     local mx, my = screen_transform:inverseTransformPoint(x, y)
     mx = math.floor(mx)
     my = math.floor(my)
+    for _, elt in ipairs(ui_layouts.game) do
+        elt:on_mouse_down(mx, my)
+    end
 
     if reserve:click(mx, my) then return end
 
