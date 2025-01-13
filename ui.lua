@@ -1,6 +1,13 @@
 local Object = require "lib.classic"
 local vector = require "vector"
 
+---@enum ButtonState
+ButtonState = {
+    Normal = 1,
+    Hovered = 2,
+    Pressed = 3,
+}
+
 ---@type love.Image
 local ui_texture
 
@@ -13,7 +20,7 @@ local ui_texture
 ---@field faces love.Quad[]
 ---@field is_inside fun(self:UIElement, x:number, y:number):boolean
 ---@field draw fun(self:UIElement)
----@field on_mouse_move fun(self:UIElement, x:number, y:number)
+---@field on_mouse_move fun(self:UIElement, x:number, y:number, pressed:boolean)
 ---@field on_mouse_down fun(self:UIElement, x:number, y:number):boolean
 ---@field on_mouse_up fun(self:UIElement, x:number, y:number)
 ---@overload fun(x:number, y:number, width:number, height:number, faces:Vector[]):UIElement
@@ -44,7 +51,7 @@ function UIElement:draw()
     love.graphics.draw(ui_texture, self.faces[self.state], self.x, self.y)
 end
 
-function UIElement:on_mouse_move(x, y) end
+function UIElement:on_mouse_move(x, y, pressed) end
 
 function UIElement:on_mouse_down(x, y)
     return self:is_inside(x, y)
@@ -53,29 +60,52 @@ end
 function UIElement:on_mouse_up(x, y) end
 
 ---@class Button: UIElement
+---@field was_pressed boolean
+---@field state ButtonState
 local Button = UIElement:extend()
 
-function Button:on_mouse_move(x, y)
+function Button:new(x, y, width, height, faces)
+    Button.super.new(self, x, y, width, height, faces)
+    self.was_pressed = false
+end
+
+function Button:on_mouse_move(x, y, pressed)
     if self:is_inside(x, y) then
-        self.state = 2
+        if pressed then
+            if self.was_pressed then
+                self.state = ButtonState.Pressed
+            else
+                self.state = ButtonState.Normal
+            end
+        else
+            self.state = ButtonState.Hovered
+        end
     else
-        self.state = 1
+        if self.was_pressed then
+            self.state = ButtonState.Hovered
+        else
+            self.state = ButtonState.Normal
+        end
     end
     --print(self.state)
 end
 
 function Button:on_mouse_up(x, y)
     if self:is_inside(x, y) then
-        print "Button"
-        self.state = 2
+        self.state = ButtonState.Hovered
+        if self.was_pressed then
+            print "Button"
+        end
     else
-        self.state = 1
+        self.state = ButtonState.Normal
     end
+    self.was_pressed = false
 end
 
 function Button:on_mouse_down(x, y)
     if self:is_inside(x, y) then
-        self.state = 3
+        self.was_pressed = true
+        self.state = ButtonState.Pressed
     end
 end
 

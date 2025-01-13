@@ -116,8 +116,9 @@ function love.mousemoved(x, y, dx, dy, istouch)
     local mx, my = screen_transform:inverseTransformPoint(x, y)
     mx = math.floor(mx)
     my = math.floor(my)
+    local mouse_pressed = love.mouse.isDown(1)
     for _, elt in ipairs(ui_layouts.game) do
-        elt:on_mouse_move(mx, my)
+        elt:on_mouse_move(mx, my, mouse_pressed)
     end
 end
 
