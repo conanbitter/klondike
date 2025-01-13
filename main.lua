@@ -62,14 +62,14 @@ function love.draw()
     for _, elt in ipairs(ui_layouts.game) do
         elt:draw()
     end
-
+    --[[
     for _, deck in ipairs(all_decks) do
         deck:draw()
     end
 
     if #hand > 0 then
         cards.draw_multiple(hand, hand_x, hand_y)
-    end
+    end]]
 
     love.graphics.pop()
 end
