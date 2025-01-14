@@ -165,16 +165,16 @@ function module.init()
     ui_texture = love.graphics.newImage("ui.png")
     local group = {
         Switch(100, 100, 31, 26, {
-            vector.new_vector(202, 1),
-            vector.new_vector(202, 28),
-            vector.new_vector(202, 55),
-            vector.new_vector(202, 82),
+            vector.new_vector(1, 109),
+            vector.new_vector(1, 136),
+            vector.new_vector(1, 163),
+            vector.new_vector(1, 190),
         }),
         Switch(150, 100, 31, 26, {
-            vector.new_vector(234, 1),
-            vector.new_vector(234, 28),
-            vector.new_vector(234, 55),
-            vector.new_vector(234, 82),
+            vector.new_vector(33, 109),
+            vector.new_vector(33, 136),
+            vector.new_vector(33, 163),
+            vector.new_vector(33, 190),
         })
     }
     for _, sw in pairs(group) do
@@ -183,9 +183,9 @@ function module.init()
     return {
         game = {
             Button(107, 2, 31, 31, {
-                vector.new_vector(170, 1),
-                vector.new_vector(170, 33),
-                vector.new_vector(170, 65),
+                vector.new_vector(217, 121),
+                vector.new_vector(217, 153),
+                vector.new_vector(217, 185),
             }),
             group[1],
             group[2],
