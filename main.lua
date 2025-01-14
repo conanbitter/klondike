@@ -27,17 +27,24 @@ local since_last_mousedown = nil
 
 local screen_transform = love.math.newTransform()
 
----@type { [string]:UIElement[] }
-local ui_layouts
-
 _G.DOUBLE_CLICK_TIME = 0.3
+
+---@param command string
+---@param value any
+local function ui_callback(command, value)
+    if value then
+        print(command .. " - " .. value)
+    else
+        print(command)
+    end
+end
 
 function love.load()
     love.graphics.setBackgroundColor(62 / 255, 140 / 255, 54 / 255)
     love.graphics.setDefaultFilter("nearest", "nearest")
     cards.init()
     all_decks, reserve, homes = decks.init()
-    ui_layouts = ui.init()
+    ui.init(ui_callback)
 
     screen_transform:scale(3, 3)
 end
@@ -59,9 +66,7 @@ function love.draw()
     love.graphics.push()
     love.graphics.applyTransform(screen_transform)
 
-    for _, elt in ipairs(ui_layouts.game) do
-        elt:draw()
-    end
+    ui.draw("game")
     --[[
     for _, deck in ipairs(all_decks) do
         deck:draw()
@@ -78,9 +83,7 @@ function love.mousepressed(x, y, button, istouch, presses)
     local mx, my = screen_transform:inverseTransformPoint(x, y)
     mx = math.floor(mx)
     my = math.floor(my)
-    for _, elt in ipairs(ui_layouts.game) do
-        elt:on_mouse_down(mx, my)
-    end
+    ui.mouse_down("game", mx, my)
 
     if reserve:click(mx, my) then return end
 
@@ -117,18 +120,14 @@ function love.mousemoved(x, y, dx, dy, istouch)
     mx = math.floor(mx)
     my = math.floor(my)
     local mouse_pressed = love.mouse.isDown(1)
-    for _, elt in ipairs(ui_layouts.game) do
-        elt:on_mouse_move(mx, my, mouse_pressed)
-    end
+    ui.mouse_move("game", mx, my, mouse_pressed)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
     local mx, my = screen_transform:inverseTransformPoint(x, y)
     mx = math.floor(mx)
     my = math.floor(my)
-    for _, elt in ipairs(ui_layouts.game) do
-        elt:on_mouse_up(mx, my)
-    end
+    ui.mouse_up("game", mx, my)
 
     if #hand == 0 then return end
     ---@type Deck?
