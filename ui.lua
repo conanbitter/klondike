@@ -129,7 +129,9 @@ function Button:on_mouse_down(x, y)
     if self:is_inside(x, y) then
         self.was_pressed = true
         self.state = ButtonState.Pressed
+        return true
     end
+    return false
 end
 
 ---@class Switch: UIElement
@@ -162,15 +164,19 @@ function Switch:on_mouse_move(x, y, pressed)
 end
 
 function Switch:on_mouse_down(x, y)
-    if self:is_inside(x, y) and not self.enabled then
-        for _, sw in pairs(self.others) do
-            sw.enabled = false
-            sw.state = SwitchState.Off
+    if self:is_inside(x, y) then
+        if not self.enabled then
+            for _, sw in pairs(self.others) do
+                sw.enabled = false
+                sw.state = SwitchState.Off
+            end
+            self.enabled = true
+            self.state = SwitchState.HoveredOn
+            self:activate()
         end
-        self.enabled = true
-        self.state = SwitchState.HoveredOn
-        self:activate()
+        return true
     end
+    return false
 end
 
 local module = {}
@@ -300,10 +306,12 @@ end
 ---@param layout string
 ---@param x number
 ---@param y number
+---@return boolean
 function module.mouse_down(layout, x, y)
     for _, elt in ipairs(ui_layouts[layout]) do
-        if elt:on_mouse_down(x, y) then break end
+        if elt:on_mouse_down(x, y) then return true end
     end
+    return false
 end
 
 ---@param layout string

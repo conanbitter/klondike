@@ -27,7 +27,19 @@ local since_last_mousedown = nil
 
 local menu_layout = "menu_en"
 
+---@type love.Image
+local menu_background
+
 local screen_transform = love.math.newTransform()
+
+---@enum AppState
+local AppState = {
+    Game = 1,
+    Menu = 2,
+    Win = 3
+}
+
+local state = AppState.Game
 
 _G.DOUBLE_CLICK_TIME = 0.3
 
@@ -41,12 +53,17 @@ local function ui_callback(command, value)
     end
     if command == "lang" then
         menu_layout = value
+    elseif command == "menu" then
+        state = AppState.Menu
+    elseif command == "quit" then
+        love.event.quit()
     end
 end
 
 function love.load()
     love.graphics.setBackgroundColor(62 / 255, 140 / 255, 54 / 255)
     love.graphics.setDefaultFilter("nearest", "nearest")
+    menu_background = love.graphics.newImage("menu_back.png")
     cards.init()
     all_decks, reserve, homes = decks.init()
     ui.init(ui_callback)
@@ -70,7 +87,11 @@ function love.draw()
     -- scaling
     love.graphics.push()
     love.graphics.applyTransform(screen_transform)
-    --[[
+
+    if state == AppState.Game then
+        ui.draw("game")
+    end
+
     for _, deck in ipairs(all_decks) do
         deck:draw()
     end
@@ -78,8 +99,11 @@ function love.draw()
     if #hand > 0 then
         cards.draw_multiple(hand, hand_x, hand_y)
     end
-]]
-    ui.draw(menu_layout) --"game"
+
+    if state == AppState.Menu then
+        love.graphics.draw(menu_background, 0, 0)
+        ui.draw(menu_layout)
+    end
 
     love.graphics.pop()
 end
@@ -88,7 +112,15 @@ function love.mousepressed(x, y, button, istouch, presses)
     local mx, my = screen_transform:inverseTransformPoint(x, y)
     mx = math.floor(mx)
     my = math.floor(my)
-    ui.mouse_down(menu_layout, mx, my)
+
+    if state == AppState.Menu then
+        if not ui.mouse_down(menu_layout, mx, my) then
+            state = AppState.Game
+        end
+        return
+    else
+        ui.mouse_down("game", mx, my)
+    end
 
     if reserve:click(mx, my) then return end
 
@@ -125,14 +157,24 @@ function love.mousemoved(x, y, dx, dy, istouch)
     mx = math.floor(mx)
     my = math.floor(my)
     local mouse_pressed = love.mouse.isDown(1)
-    ui.mouse_move(menu_layout, mx, my, mouse_pressed)
+    if state == AppState.Menu then
+        ui.mouse_move(menu_layout, mx, my, mouse_pressed)
+    else
+        ui.mouse_move("game", mx, my, mouse_pressed)
+    end
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
     local mx, my = screen_transform:inverseTransformPoint(x, y)
     mx = math.floor(mx)
     my = math.floor(my)
-    ui.mouse_up(menu_layout, mx, my)
+
+    if state == AppState.Menu then
+        ui.mouse_up(menu_layout, mx, my)
+        return
+    else
+        ui.mouse_up("game", mx, my)
+    end
 
     if #hand == 0 then return end
     ---@type Deck?
