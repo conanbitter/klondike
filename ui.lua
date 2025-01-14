@@ -37,7 +37,7 @@ local _callback
 ---@field on_mouse_down fun(self:UIElement, x:number, y:number):boolean
 ---@field on_mouse_up fun(self:UIElement, x:number, y:number)
 ---@field activate fun(self:UIElement)
----@overload fun(x:number, y:number, width:number, height:number, faces:Vector[]):UIElement
+---@overload fun(x:number, y:number, width:number, height:number, faces:Vector[], command:string, value:any):UIElement
 local UIElement = Object:extend()
 
 ---@param x number
@@ -181,32 +181,100 @@ local ui_layouts
 ---@param callback fun(cmd:string, value:any)
 function module.init(callback)
     ui_texture = love.graphics.newImage("ui.png")
-    local group = {
-        Switch(100, 100, 31, 26, {
+
+    local scale_group = {
+        Switch(145, 100, 31, 26, {
             vector.new_vector(1, 109),
             vector.new_vector(1, 136),
             vector.new_vector(1, 163),
             vector.new_vector(1, 190),
         }, "scale", 1),
-        Switch(150, 100, 31, 26, {
+        Switch(177, 100, 31, 26, {
             vector.new_vector(33, 109),
             vector.new_vector(33, 136),
             vector.new_vector(33, 163),
             vector.new_vector(33, 190),
-        }, "scale", 2)
+        }, "scale", 2),
+        Switch(209, 100, 31, 26, {
+            vector.new_vector(65, 109),
+            vector.new_vector(65, 136),
+            vector.new_vector(65, 163),
+            vector.new_vector(65, 190),
+        }, "scale", 3),
+        Switch(241, 100, 31, 26, {
+            vector.new_vector(97, 109),
+            vector.new_vector(97, 136),
+            vector.new_vector(97, 163),
+            vector.new_vector(97, 190),
+        }, "scale", 4),
     }
-    for _, sw in pairs(group) do
-        sw.others = group
+    for _, sw in pairs(scale_group) do
+        sw.others = scale_group
     end
+
+    local lang_group = {
+        Switch(128, 250, 43, 29, {
+            vector.new_vector(129, 97),
+            vector.new_vector(129, 127),
+            vector.new_vector(129, 157),
+            vector.new_vector(129, 187),
+        }, "lang", "menu_en"),
+        Switch(179, 250, 43, 29, {
+            vector.new_vector(173, 97),
+            vector.new_vector(173, 127),
+            vector.new_vector(173, 157),
+            vector.new_vector(173, 187),
+        }, "lang", "menu_ru"),
+    }
+    for _, sw in pairs(lang_group) do
+        sw.others = lang_group
+    end
+
     ui_layouts = {
         game = {
             Button(107, 2, 31, 31, {
                 vector.new_vector(217, 121),
                 vector.new_vector(217, 153),
                 vector.new_vector(217, 185),
+            }, "menu"),
+        },
+        menu_en = {
+            Button(136, 70, 78, 26, {
+                vector.new_vector(1, 1),
+                vector.new_vector(1, 28),
+                vector.new_vector(1, 55),
             }, "new"),
-            group[1],
-            group[2],
+            UIElement(78, 100, 43, 26, { vector.new_vector(1, 82) }, ""),
+            scale_group[1],
+            scale_group[2],
+            scale_group[3],
+            scale_group[4],
+            Button(153, 130, 42, 26, {
+                vector.new_vector(80, 1),
+                vector.new_vector(80, 28),
+                vector.new_vector(80, 55),
+            }, "quit"),
+            lang_group[1],
+            lang_group[2]
+        },
+        menu_ru = {
+            Button(130, 70, 89, 26, {
+                vector.new_vector(123, 1),
+                vector.new_vector(123, 28),
+                vector.new_vector(123, 55),
+            }, "new"),
+            UIElement(78, 100, 65, 26, { vector.new_vector(45, 82) }, ""),
+            scale_group[1],
+            scale_group[2],
+            scale_group[3],
+            scale_group[4],
+            Button(145, 130, 57, 26, {
+                vector.new_vector(213, 1),
+                vector.new_vector(213, 28),
+                vector.new_vector(213, 55),
+            }, "quit"),
+            lang_group[1],
+            lang_group[2]
         }
     }
     _callback = callback

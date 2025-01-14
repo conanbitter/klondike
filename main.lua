@@ -25,6 +25,8 @@ local old_place = nil
 ---@type number?
 local since_last_mousedown = nil
 
+local menu_layout = "menu_en"
+
 local screen_transform = love.math.newTransform()
 
 _G.DOUBLE_CLICK_TIME = 0.3
@@ -36,6 +38,9 @@ local function ui_callback(command, value)
         print(command .. " - " .. value)
     else
         print(command)
+    end
+    if command == "lang" then
+        menu_layout = value
     end
 end
 
@@ -65,8 +70,6 @@ function love.draw()
     -- scaling
     love.graphics.push()
     love.graphics.applyTransform(screen_transform)
-
-    ui.draw("game")
     --[[
     for _, deck in ipairs(all_decks) do
         deck:draw()
@@ -74,7 +77,9 @@ function love.draw()
 
     if #hand > 0 then
         cards.draw_multiple(hand, hand_x, hand_y)
-    end]]
+    end
+]]
+    ui.draw(menu_layout) --"game"
 
     love.graphics.pop()
 end
@@ -83,7 +88,7 @@ function love.mousepressed(x, y, button, istouch, presses)
     local mx, my = screen_transform:inverseTransformPoint(x, y)
     mx = math.floor(mx)
     my = math.floor(my)
-    ui.mouse_down("game", mx, my)
+    ui.mouse_down(menu_layout, mx, my)
 
     if reserve:click(mx, my) then return end
 
@@ -120,14 +125,14 @@ function love.mousemoved(x, y, dx, dy, istouch)
     mx = math.floor(mx)
     my = math.floor(my)
     local mouse_pressed = love.mouse.isDown(1)
-    ui.mouse_move("game", mx, my, mouse_pressed)
+    ui.mouse_move(menu_layout, mx, my, mouse_pressed)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
     local mx, my = screen_transform:inverseTransformPoint(x, y)
     mx = math.floor(mx)
     my = math.floor(my)
-    ui.mouse_up("game", mx, my)
+    ui.mouse_up(menu_layout, mx, my)
 
     if #hand == 0 then return end
     ---@type Deck?
