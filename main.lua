@@ -6,6 +6,7 @@ local cards = require "cards"
 local decks = require "decks"
 local vector = require "vector"
 local ui = require "ui"
+local settings = require "settings"
 
 ---@type Deck[]
 local all_decks
@@ -56,6 +57,7 @@ local function ui_callback(command, value)
     if command == "lang" then
         menu_layout = value
     elseif command == "menu" then
+        settings.save()
         state = AppState.Menu
     elseif command == "quit" then
         love.event.quit()

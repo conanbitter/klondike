@@ -6,4 +6,5 @@ function love.conf(t)
     t.window.minwidth = 350
     t.window.minheight = 300
     t.window.vsync = 1
+    t.identity = "KlondikeCG"
 end
