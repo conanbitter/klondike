@@ -1,10 +1,13 @@
+_G.SCREEN_WIDTH = 350
+_G.SCREEN_HEIGHT = 300
+
 function love.conf(t)
     t.window.title = "Klondike"
-    t.window.width = 350 * 3
-    t.window.height = 300 * 3
+    t.window.width = SCREEN_WIDTH
+    t.window.height = SCREEN_HEIGHT
     t.window.resizable = false
-    t.window.minwidth = 350
-    t.window.minheight = 300
+    t.window.minwidth = SCREEN_WIDTH
+    t.window.minheight = SCREEN_HEIGHT
     t.window.vsync = 1
     t.identity = "KlondikeCG"
 end

@@ -46,6 +46,13 @@ local state = AppState.Game
 
 _G.DOUBLE_CLICK_TIME = 0.3
 
+---@param scale number
+local function set_scale(scale)
+    screen_transform:reset()
+    screen_transform:scale(scale, scale)
+    love.window.setMode(SCREEN_WIDTH * scale, SCREEN_HEIGHT * scale)
+end
+
 ---@param command string
 ---@param value any
 local function ui_callback(command, value)
@@ -55,16 +62,25 @@ local function ui_callback(command, value)
         print(command)
     end
     if command == "lang" then
-        menu_layout = value
+        menu_layout = "menu_" .. value
+        settings.language = value
+    elseif command == "scale" then
+        set_scale(value)
+        settings.scale = value
     elseif command == "menu" then
-        settings.save()
         state = AppState.Menu
     elseif command == "quit" then
+        settings.save()
         love.event.quit()
     end
 end
 
 function love.load()
+    settings.load()
+    DOUBLE_CLICK_TIME = settings.dblclick
+    menu_layout = "menu_" .. settings.language
+    set_scale(settings.scale)
+
     love.graphics.setBackgroundColor(62 / 255, 140 / 255, 54 / 255)
     love.graphics.setDefaultFilter("nearest", "nearest")
     menu_background = love.graphics.newImage("menu_back.png")
@@ -72,7 +88,7 @@ function love.load()
     all_decks, reserve, homes = decks.init()
     ui.init(ui_callback)
 
-    screen_transform:scale(3, 3)
+    --screen_transform:scale(3, 3)
 end
 
 function love.update(dt)
@@ -128,6 +144,7 @@ function love.mousepressed(x, y, button, istouch, presses)
     if state == AppState.Menu then
         if not ui.mouse_down(menu_layout, mx, my) then
             state = AppState.Game
+            settings.save()
         end
         return
     else

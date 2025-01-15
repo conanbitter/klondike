@@ -224,13 +224,13 @@ function module.init(callback)
             vector.new_vector(129, 127),
             vector.new_vector(129, 157),
             vector.new_vector(129, 187),
-        }, "lang", "menu_en"),
+        }, "lang", "en"),
         Switch(179, 250, 43, 29, {
             vector.new_vector(173, 97),
             vector.new_vector(173, 127),
             vector.new_vector(173, 157),
             vector.new_vector(173, 187),
-        }, "lang", "menu_ru"),
+        }, "lang", "ru"),
     }
     for _, sw in pairs(lang_group) do
         sw.others = lang_group
