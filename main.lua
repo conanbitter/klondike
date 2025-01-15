@@ -30,6 +30,8 @@ local menu_layout = "menu_en"
 ---@type love.Image
 local menu_background
 
+local background_offset = 0.0
+
 local screen_transform = love.math.newTransform()
 
 ---@enum AppState
@@ -72,13 +74,20 @@ function love.load()
 end
 
 function love.update(dt)
-    if #hand > 0 then
-        local mx, my = screen_transform:inverseTransformPoint(love.mouse.getPosition())
-        hand_x = math.floor(mx - CARD_WIDTH / 2);
-        if #hand == 1 then
-            hand_y = math.floor(my - CARD_HEIGHT / 2);
-        else
-            hand_y = math.floor(my - FLAT_OFFSET / 2);
+    if state == AppState.Menu then
+        background_offset = background_offset - dt * 5.0
+        if -background_offset > 350 then
+            background_offset = background_offset + 350
+        end
+    else
+        if #hand > 0 then
+            local mx, my = screen_transform:inverseTransformPoint(love.mouse.getPosition())
+            hand_x = math.floor(mx - CARD_WIDTH / 2);
+            if #hand == 1 then
+                hand_y = math.floor(my - CARD_HEIGHT / 2);
+            else
+                hand_y = math.floor(my - FLAT_OFFSET / 2);
+            end
         end
     end
 end
@@ -101,7 +110,8 @@ function love.draw()
     end
 
     if state == AppState.Menu then
-        love.graphics.draw(menu_background, 0, 0)
+        love.graphics.draw(menu_background, background_offset, 0)
+        love.graphics.draw(menu_background, background_offset + 350, 0)
         ui.draw(menu_layout)
     end
 
