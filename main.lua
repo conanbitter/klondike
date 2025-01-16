@@ -53,6 +53,14 @@ local function set_scale(scale)
     love.window.setMode(SCREEN_WIDTH * scale, SCREEN_HEIGHT * scale)
 end
 
+local function check_win()
+    for _, home in pairs(homes) do
+        print(#home.cards)
+        if #home.cards < 13 then return end
+    end
+    state = AppState.Win
+    print("Win!")
+end
 ---@param command string
 ---@param value any
 local function ui_callback(command, value)
@@ -171,6 +179,7 @@ function love.mousepressed(x, y, button, istouch, presses)
             if old_place and old_place.covered ~= nil and old_place.covered >= #old_place.cards then
                 old_place.covered = #old_place.cards - 1
             end
+            check_win()
         end
         since_last_mousedown = nil
     else
@@ -227,6 +236,7 @@ function love.mousereleased(x, y, button, istouch, presses)
             if old_place ~= candidate and old_place.covered ~= nil and old_place.covered >= #old_place.cards then
                 old_place.covered = #old_place.cards - 1
             end
+            check_win()
             return
         end
     end
