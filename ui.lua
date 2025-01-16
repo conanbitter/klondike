@@ -116,7 +116,7 @@ end
 
 function Button:on_mouse_up(x, y)
     if self:is_inside(x, y) then
-        self.state = ButtonState.Hovered
+        self.state = ButtonState.Normal
         if self.was_pressed then
             self:activate()
         end
@@ -249,9 +249,15 @@ function module.init(callback)
         lang_group[2]:enable()
     end
 
+    local close_button = Button(312, 2, 36, 36, {
+        vector.new_vector(249, 106),
+        vector.new_vector(249, 143),
+        vector.new_vector(249, 180),
+    }, "close")
+
     ui_layouts = {
         game = {
-            Button(107, 2, 31, 31, {
+            Button(108, 2, 31, 31, {
                 vector.new_vector(217, 121),
                 vector.new_vector(217, 153),
                 vector.new_vector(217, 185),
@@ -274,7 +280,8 @@ function module.init(callback)
                 vector.new_vector(80, 55),
             }, "quit"),
             lang_group[1],
-            lang_group[2]
+            lang_group[2],
+            close_button
         },
         menu_ru = {
             Button(130, 70, 89, 26, {
@@ -293,7 +300,8 @@ function module.init(callback)
                 vector.new_vector(213, 55),
             }, "quit"),
             lang_group[1],
-            lang_group[2]
+            lang_group[2],
+            close_button
         }
     }
     _callback = callback

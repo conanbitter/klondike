@@ -69,6 +69,9 @@ local function ui_callback(command, value)
         settings.scale = value
     elseif command == "menu" then
         state = AppState.Menu
+    elseif command == "close" then
+        state = AppState.Game
+        settings.save()
     elseif command == "quit" then
         settings.save()
         love.event.quit()
@@ -142,10 +145,7 @@ function love.mousepressed(x, y, button, istouch, presses)
     my = math.floor(my)
 
     if state == AppState.Menu then
-        if not ui.mouse_down(menu_layout, mx, my) then
-            state = AppState.Game
-            settings.save()
-        end
+        ui.mouse_down(menu_layout, mx, my)
         return
     else
         ui.mouse_down("game", mx, my)
