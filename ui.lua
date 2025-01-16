@@ -1,5 +1,6 @@
 local Object = require "lib.classic"
 local vector = require "vector"
+local settings = require "settings"
 
 ---@enum ButtonState
 local ButtonState = {
@@ -137,6 +138,7 @@ end
 ---@class Switch: UIElement
 ---@field others Switch[]
 ---@field enabled boolean
+---@field enable fun(self:Switch)
 ---@overload fun(x:number, y:number, width:number, height:number, faces:Vector[], command:string, value:any):Switch
 local Switch = UIElement:extend()
 
@@ -179,6 +181,11 @@ function Switch:on_mouse_down(x, y)
     return false
 end
 
+function Switch:enable()
+    self.enabled = true
+    self.state = SwitchState.On
+end
+
 local module = {}
 
 ---@type { [string]:UIElement[] }
@@ -217,6 +224,7 @@ function module.init(callback)
     for _, sw in pairs(scale_group) do
         sw.others = scale_group
     end
+    scale_group[settings.scale]:enable()
 
     local lang_group = {
         Switch(128, 250, 43, 29, {
@@ -234,6 +242,11 @@ function module.init(callback)
     }
     for _, sw in pairs(lang_group) do
         sw.others = lang_group
+    end
+    if settings.language == "en" then
+        lang_group[1]:enable()
+    elseif settings.language == "ru" then
+        lang_group[2]:enable()
     end
 
     ui_layouts = {
