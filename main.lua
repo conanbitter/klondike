@@ -4,7 +4,7 @@ end
 
 local cards = require "cards"
 local decks = require "decks"
-local vector = require "vector"
+local Vector = require "vector"
 local ui = require "ui"
 local settings = require "settings"
 
@@ -218,7 +218,7 @@ function love.mousereleased(x, y, button, istouch, presses)
     ---@type Deck?
     local candidate = nil
     local distance = 1.0e10
-    local hand_pos = vector.new_vector(hand_x, hand_y)
+    local hand_pos = Vector(hand_x, hand_y)
     for _, deck in ipairs(all_decks) do
         local deck_pos = deck:candrop(hand_x, hand_y)
         if deck_pos then

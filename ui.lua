@@ -1,5 +1,5 @@
 local Object = require "lib.classic"
-local vector = require "vector"
+local Vector = require "vector"
 local settings = require "settings"
 
 ---@enum ButtonState
@@ -197,28 +197,28 @@ function module.init(callback)
 
     local scale_group = {
         Switch(145, 100, 31, 26, {
-            vector.new_vector(1, 109),
-            vector.new_vector(1, 136),
-            vector.new_vector(1, 163),
-            vector.new_vector(1, 190),
+            Vector(1, 109),
+            Vector(1, 136),
+            Vector(1, 163),
+            Vector(1, 190),
         }, "scale", 1),
         Switch(177, 100, 31, 26, {
-            vector.new_vector(33, 109),
-            vector.new_vector(33, 136),
-            vector.new_vector(33, 163),
-            vector.new_vector(33, 190),
+            Vector(33, 109),
+            Vector(33, 136),
+            Vector(33, 163),
+            Vector(33, 190),
         }, "scale", 2),
         Switch(209, 100, 31, 26, {
-            vector.new_vector(65, 109),
-            vector.new_vector(65, 136),
-            vector.new_vector(65, 163),
-            vector.new_vector(65, 190),
+            Vector(65, 109),
+            Vector(65, 136),
+            Vector(65, 163),
+            Vector(65, 190),
         }, "scale", 3),
         Switch(241, 100, 31, 26, {
-            vector.new_vector(97, 109),
-            vector.new_vector(97, 136),
-            vector.new_vector(97, 163),
-            vector.new_vector(97, 190),
+            Vector(97, 109),
+            Vector(97, 136),
+            Vector(97, 163),
+            Vector(97, 190),
         }, "scale", 4),
     }
     for _, sw in pairs(scale_group) do
@@ -228,16 +228,16 @@ function module.init(callback)
 
     local lang_group = {
         Switch(128, 250, 43, 29, {
-            vector.new_vector(129, 97),
-            vector.new_vector(129, 127),
-            vector.new_vector(129, 157),
-            vector.new_vector(129, 187),
+            Vector(129, 97),
+            Vector(129, 127),
+            Vector(129, 157),
+            Vector(129, 187),
         }, "lang", "en"),
         Switch(179, 250, 43, 29, {
-            vector.new_vector(173, 97),
-            vector.new_vector(173, 127),
-            vector.new_vector(173, 157),
-            vector.new_vector(173, 187),
+            Vector(173, 97),
+            Vector(173, 127),
+            Vector(173, 157),
+            Vector(173, 187),
         }, "lang", "ru"),
     }
     for _, sw in pairs(lang_group) do
@@ -250,34 +250,34 @@ function module.init(callback)
     end
 
     local close_button = Button(312, 2, 36, 36, {
-        vector.new_vector(249, 106),
-        vector.new_vector(249, 143),
-        vector.new_vector(249, 180),
+        Vector(249, 106),
+        Vector(249, 143),
+        Vector(249, 180),
     }, "close")
 
     ui_layouts = {
         game = {
             Button(108, 2, 31, 31, {
-                vector.new_vector(217, 121),
-                vector.new_vector(217, 153),
-                vector.new_vector(217, 185),
+                Vector(217, 121),
+                Vector(217, 153),
+                Vector(217, 185),
             }, "menu"),
         },
         menu_en = {
             Button(136, 70, 78, 26, {
-                vector.new_vector(1, 1),
-                vector.new_vector(1, 28),
-                vector.new_vector(1, 55),
+                Vector(1, 1),
+                Vector(1, 28),
+                Vector(1, 55),
             }, "new"),
-            UIElement(78, 100, 43, 26, { vector.new_vector(1, 82) }, ""),
+            UIElement(78, 100, 43, 26, { Vector(1, 82) }, ""),
             scale_group[1],
             scale_group[2],
             scale_group[3],
             scale_group[4],
             Button(153, 130, 42, 26, {
-                vector.new_vector(80, 1),
-                vector.new_vector(80, 28),
-                vector.new_vector(80, 55),
+                Vector(80, 1),
+                Vector(80, 28),
+                Vector(80, 55),
             }, "quit"),
             lang_group[1],
             lang_group[2],
@@ -285,19 +285,19 @@ function module.init(callback)
         },
         menu_ru = {
             Button(130, 70, 89, 26, {
-                vector.new_vector(123, 1),
-                vector.new_vector(123, 28),
-                vector.new_vector(123, 55),
+                Vector(123, 1),
+                Vector(123, 28),
+                Vector(123, 55),
             }, "new"),
-            UIElement(78, 100, 65, 26, { vector.new_vector(45, 82) }, ""),
+            UIElement(78, 100, 65, 26, { Vector(45, 82) }, ""),
             scale_group[1],
             scale_group[2],
             scale_group[3],
             scale_group[4],
             Button(145, 130, 57, 26, {
-                vector.new_vector(213, 1),
-                vector.new_vector(213, 28),
-                vector.new_vector(213, 55),
+                Vector(213, 1),
+                Vector(213, 28),
+                Vector(213, 55),
             }, "quit"),
             lang_group[1],
             lang_group[2],

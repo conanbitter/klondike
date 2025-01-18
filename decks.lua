@@ -1,7 +1,7 @@
 local module = {}
 
 local cards = require "cards"
-local vector = require "vector"
+local Vector = require "vector"
 
 ---@class Card
 ---@field suit Suit
@@ -111,7 +111,7 @@ local function candrop_flat(self, x, y)
     local offset = (#self.cards - 1) * FLAT_OFFSET
     if offset < 0 then offset = 0 end
     if card_intersect(x, y, self.x, self.y + offset) then
-        return vector.new_vector(self.x, self.y + offset)
+        return Vector(self.x, self.y + offset)
     else
         return nil
     end
@@ -179,7 +179,7 @@ end
 ---@return Vector?
 local function home_candrop(self, x, y)
     if card_intersect(x, y, self.x, self.y) then
-        return vector.new_vector(self.x, self.y)
+        return Vector(self.x, self.y)
     else
         return nil
     end
@@ -262,9 +262,9 @@ end
 ---@return Vector?
 local function reserve_candrop(self, x, y)
     if card_intersect(x, y, self.x, self.y) then
-        return vector.new_vector(self.x, self.y)
+        return Vector(self.x, self.y)
     elseif card_intersect(x, y, self.x + RESERVE_OFFSET, self.y) then
-        return vector.new_vector(self.x + RESERVE_OFFSET, self.y)
+        return Vector(self.x + RESERVE_OFFSET, self.y)
     else
         return nil
     end

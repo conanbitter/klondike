@@ -1,27 +1,28 @@
+local Object = require "lib.classic"
+
 local module = {}
 
 ---@class Vector
 ---@field x number
 ---@field y number
 ---@field distance2 fun(self: Vector, other: Vector):number
+---@overload fun(x:number, y:number)
+local Vector = Object:extend()
 
 ---comment
 ---@param self Vector
 ---@param other Vector
 ---@return number
-local function vector_distance2(self, other)
+function Vector:distance2(other)
     return (self.x - other.x) * (self.x - other.x) + (self.y - other.y) * (self.y - other.y)
 end
 
+---@param self Vector
 ---@param x number
 ---@param y number
----@return Vector
-function module.new_vector(x, y)
-    return {
-        x = x,
-        y = y,
-        distance2 = vector_distance2
-    }
+function Vector:new(x, y)
+    self.x = x
+    self.y = y
 end
 
-return module
+return Vector
