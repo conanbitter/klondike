@@ -36,7 +36,7 @@ end
 ---@field placeholder love.Quad?
 ---@field draw fun(self:Deck)
 ---@field is_empty fun(self:Deck):boolean
----@field trygrab fun(self:Deck, x:number, y:number, hand:Card[]):boolean
+---@field trygrab fun(self:Deck, x:number, y:number, hand:Card[]):Vector?
 ---@field candrop fun(self:Deck, x:number, y:number):Vector?
 ---@field trydrop fun(self:Deck, x:number, y:number, hand:Card[]):boolean
 ---@field revert_drop fun(self:Deck, hand:Card[])
@@ -92,15 +92,15 @@ end
 ---@param x number
 ---@param y number
 ---@param hand Card[]
----@return boolean
+---@return Vector?
 local function trygrab_flat(self, x, y, hand)
-    if self:is_empty() then return false end
-    if x < self.x or x > self.x + CARD_WIDTH then return false end
-    if y < self.y + self.covered * FLAT_OFFSET or y >= self.y + CARD_HEIGHT + (#self.cards - 1) * FLAT_OFFSET then return false end
+    if self:is_empty() then return nil end
+    if x < self.x or x > self.x + CARD_WIDTH then return nil end
+    if y < self.y + self.covered * FLAT_OFFSET or y >= self.y + CARD_HEIGHT + (#self.cards - 1) * FLAT_OFFSET then return nil end
     local index = math.floor((y - self.y) / FLAT_OFFSET) + 1
     if index > #self.cards then index = #self.cards end
     cards.move_multiple(self.cards, hand, index)
-    return true
+    return Vector(self.x, self.y + (index - 1) * FLAT_OFFSET)
 end
 
 ---@param self FlatDeck
@@ -160,17 +160,17 @@ end
 ---@param x number
 ---@param y number
 ---@param hand Card[]
----@return boolean
+---@return Vector?
 local function home_trygrab(self, x, y, hand)
-    if self:is_empty() then return false end
+    if self:is_empty() then return nil end
     if x < self.x or
         x > self.x + CARD_WIDTH or
         y < self.y or
         y >= self.y + CARD_HEIGHT then
-        return false
+        return nil
     end
     cards.move_single(self.cards, hand)
-    return true
+    return Vector(self.x, self.y)
 end
 
 ---@param self Home
@@ -242,18 +242,18 @@ end
 ---@param x number
 ---@param y number
 ---@param hand Card[]
----@return boolean
+---@return Vector?
 local function reserve_trygrab(self, x, y, hand)
-    if self:is_empty() or self.index == 0 then return false end
+    if self:is_empty() or self.index == 0 then return nil end
     if x < self.x + RESERVE_OFFSET or
         x > self.x + CARD_WIDTH + RESERVE_OFFSET or
         y < self.y or
         y >= self.y + CARD_HEIGHT then
-        return false
+        return nil
     end
     cards.move_single(self.cards, self.index, hand)
     self.index = self.index - 1
-    return true
+    return Vector(self.x + RESERVE_OFFSET, self.y)
 end
 
 ---@param self Reserve

@@ -35,6 +35,8 @@ local background_offset = 0.0
 
 local screen_transform = love.math.newTransform()
 
+local hand_latched = false
+
 ---@enum AppState
 local AppState = {
     Game = 1,
@@ -42,9 +44,21 @@ local AppState = {
     Win = 3
 }
 
+---@enum Animation
+local Animation = {
+    None = 1,
+    Grabbing = 2,
+    Dropping = 3,
+    Returning = 4,
+    NewGame = 5,
+    Victory = 6
+}
+
 local state = AppState.Game
+local animation = Animation.None
 
 _G.DOUBLE_CLICK_TIME = 0.3
+_G.HAND_MOVE_SPEED = 400.0
 
 ---@param scale number
 local function set_scale(scale)
@@ -61,6 +75,7 @@ local function check_win()
     state = AppState.Win
     print("Win!")
 end
+
 ---@param command string
 ---@param value any
 local function ui_callback(command, value)
@@ -111,11 +126,28 @@ function love.update(dt)
     else
         if #hand > 0 then
             local mx, my = screen_transform:inverseTransformPoint(love.mouse.getPosition())
-            hand_x = math.floor(mx - CARD_WIDTH / 2);
+            mx = math.floor(mx - CARD_WIDTH / 2);
             if #hand == 1 then
-                hand_y = math.floor(my - CARD_HEIGHT / 2);
+                my = math.floor(my - CARD_HEIGHT / 2);
             else
-                hand_y = math.floor(my - FLAT_OFFSET / 2);
+                my = math.floor(my - FLAT_OFFSET / 2);
+            end
+            if animation == Animation.Grabbing then
+                local hand_vec = Vector(hand_x, hand_y)
+                local pointer_vec = Vector(mx, my)
+                if hand_vec:distance(pointer_vec) < HAND_MOVE_SPEED * dt then
+                    animation = Animation.None
+                    hand_latched = true
+                else
+                    local direct = hand_vec:direction(pointer_vec)
+                    hand_vec = hand_vec + hand_vec:direction(pointer_vec) * HAND_MOVE_SPEED * dt
+                    hand_x = hand_vec.x
+                    hand_y = hand_vec.y
+                end
+            end
+            if hand_latched then
+                hand_x = mx
+                hand_y = my
             end
         end
     end
@@ -162,8 +194,13 @@ function love.mousepressed(x, y, button, istouch, presses)
     if reserve:click(mx, my) then return end
 
     for _, deck in ipairs(all_decks) do
-        if deck:trygrab(mx, my, hand) then
+        local pos = deck:trygrab(mx, my, hand)
+        if pos then
             old_place = deck
+            animation = Animation.Grabbing
+            hand_latched = false
+            hand_x = pos.x
+            hand_y = pos.y
             break
         end
     end
