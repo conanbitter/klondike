@@ -281,14 +281,16 @@ function love.mousereleased(x, y, button, istouch, presses)
     local distance = 1.0e10
     local hand_pos = Vector(hand_x, hand_y)
     local candidate_pos = Vector(0, 0)
+    local candidate_acc = DropAccept.Decline
     for _, deck in ipairs(all_decks) do
-        local deck_pos = deck:candrop(hand_x, hand_y)
-        if deck_pos then
+        local accept, deck_pos = deck:candrop(hand_x, hand_y, hand)
+        if accept ~= DropAccept.Decline and deck_pos then
             local deck_distance = hand_pos:distance2(deck_pos)
             if deck_distance < distance then
                 candidate = deck
                 candidate_pos.x = deck_pos.x
                 candidate_pos.y = deck_pos.y
+                candidate_acc = accept
                 -- TODO: Process not acceptable places
                 if deck.covered then
                     candidate_pos.y = candidate_pos.y + FLAT_OFFSET
@@ -297,13 +299,11 @@ function love.mousereleased(x, y, button, istouch, presses)
             end
         end
     end
-    if candidate then
+    if candidate and candidate_acc == DropAccept.Accept then
         target_deck = candidate
         target_pos = candidate_pos
         animation = Animation.Dropping
-        return
-    end
-    if old_place then
+    elseif old_place then
         target_deck = old_place
         target_pos = old_pos
         animation = Animation.Returning

@@ -29,6 +29,13 @@ local function card_intersect(x1, y1, x2, y2)
         y2 - y1 <= CARD_HEIGHT
 end
 
+---@enum DropAccept
+DropAccept = {
+    Accept = 1,
+    AcceptPos = 2,
+    Decline = 3
+}
+
 ---@class Deck
 ---@field x number
 ---@field y number
@@ -37,8 +44,8 @@ end
 ---@field draw fun(self:Deck)
 ---@field is_empty fun(self:Deck):boolean
 ---@field trygrab fun(self:Deck, x:number, y:number, hand:Card[]):Vector?
----@field candrop fun(self:Deck, x:number, y:number):Vector?
----@field trydrop fun(self:Deck, x:number, y:number, hand:Card[]):boolean
+---@field candrop fun(self:Deck, x:number, y:number, hand:Card[]):DropAccept, Vector?
+---@field trydrop fun(self:Deck, x:number, y:number, hand:Card[])
 ---@field revert_drop fun(self:Deck, hand:Card[])
 
 ---@param self Deck
@@ -106,14 +113,22 @@ end
 ---@param self FlatDeck
 ---@param x number
 ---@param y number
----@return Vector?
-local function candrop_flat(self, x, y)
+---@param hand Card[]
+---@return DropAccept, Vector?
+local function candrop_flat(self, x, y, hand)
     local offset = (#self.cards - 1) * FLAT_OFFSET
     if offset < 0 then offset = 0 end
     if card_intersect(x, y, self.x, self.y + offset) then
-        return Vector(self.x, self.y + offset)
+        local pos = Vector(self.x, self.y + offset)
+        if self:is_empty() or
+            (cards.suit_compatible(self.cards[#self.cards].suit, hand[1].suit) and
+                self.cards[#self.cards].rank - hand[1].rank == 1) then
+            return DropAccept.Accept, pos
+        else
+            return DropAccept.AcceptPos, pos
+        end
     else
-        return nil
+        return DropAccept.Decline, nil
     end
 end
 
@@ -176,12 +191,24 @@ end
 ---@param self Home
 ---@param x number
 ---@param y number
----@return Vector?
-local function home_candrop(self, x, y)
+---@param hand Card[]
+---@return DropAccept, Vector?
+local function home_candrop(self, x, y, hand)
     if card_intersect(x, y, self.x, self.y) then
-        return Vector(self.x, self.y)
+        local pos = Vector(self.x, self.y)
+        local rank = 1
+        if not self:is_empty() then
+            rank = self.cards[#self.cards].rank + 1
+        end
+        if card_intersect(x, y, self.x, self.y) and
+            #hand == 1 and
+            hand[1].suit == self.suit and
+            hand[1].rank == rank then
+            return DropAccept.Accept, pos
+        end
+        return DropAccept.AcceptPos, pos
     else
-        return nil
+        return DropAccept.Decline, nil
     end
 end
 
@@ -259,14 +286,15 @@ end
 ---@param self Reserve
 ---@param x number
 ---@param y number
----@return Vector?
-local function reserve_candrop(self, x, y)
+---@param hand Card[]
+---@return DropAccept, Vector?
+local function reserve_candrop(self, x, y, hand)
     if card_intersect(x, y, self.x, self.y) then
-        return Vector(self.x, self.y)
+        return DropAccept.AcceptPos, Vector(self.x, self.y)
     elseif card_intersect(x, y, self.x + RESERVE_OFFSET, self.y) then
-        return Vector(self.x + RESERVE_OFFSET, self.y)
+        return DropAccept.AcceptPos, Vector(self.x + RESERVE_OFFSET, self.y)
     else
-        return nil
+        return DropAccept.Decline, nil
     end
 end
 
