@@ -22,6 +22,8 @@ local hand_x = 0
 local hand_y = 0
 ---@type Deck?
 local old_place = nil
+---@type Vector
+local old_pos = Vector(0, 0)
 
 ---@type number?
 local since_last_mousedown = nil
@@ -36,6 +38,11 @@ local background_offset = 0.0
 local screen_transform = love.math.newTransform()
 
 local hand_latched = false
+
+local target_pos = Vector(0, 0)
+
+---@type Deck
+local target_deck
 
 ---@enum AppState
 local AppState = {
@@ -132,22 +139,39 @@ function love.update(dt)
             else
                 my = math.floor(my - FLAT_OFFSET / 2);
             end
+
             if animation == Animation.Grabbing then
-                local hand_vec = Vector(hand_x, hand_y)
-                local pointer_vec = Vector(mx, my)
-                if hand_vec:distance(pointer_vec) < HAND_MOVE_SPEED * dt then
-                    animation = Animation.None
-                    hand_latched = true
-                else
-                    local direct = hand_vec:direction(pointer_vec)
-                    hand_vec = hand_vec + hand_vec:direction(pointer_vec) * HAND_MOVE_SPEED * dt
-                    hand_x = hand_vec.x
-                    hand_y = hand_vec.y
-                end
-            end
-            if hand_latched then
+                target_pos.x = mx
+                target_pos.y = my
+            elseif animation == Animation.None then
                 hand_x = mx
                 hand_y = my
+            end
+        end
+
+        if animation == Animation.Grabbing or
+            animation == Animation.Dropping or
+            animation == Animation.Returning then
+            local hand_vec = Vector(hand_x, hand_y)
+            if hand_vec:distance(target_pos) > HAND_MOVE_SPEED * dt then
+                local direction = hand_vec:direction(target_pos)
+                hand_vec = hand_vec + direction * HAND_MOVE_SPEED * dt
+                hand_x = hand_vec.x
+                hand_y = hand_vec.y
+            else
+                if animation == Animation.Dropping then
+                    if target_deck:trydrop(hand_x, hand_y, hand) then
+                        cards.move_multiple(hand, target_deck.cards)
+                        ---@cast old_place FlatDeck
+                        if old_place ~= target_deck and old_place.covered ~= nil and old_place.covered >= #old_place.cards then
+                            old_place.covered = #old_place.cards - 1
+                        end
+                        check_win()
+                    end
+                elseif animation == Animation.Returning then
+                    if old_place then old_place:revert_drop(hand) end
+                end
+                animation = Animation.None
             end
         end
     end
@@ -197,8 +221,8 @@ function love.mousepressed(x, y, button, istouch, presses)
         local pos = deck:trygrab(mx, my, hand)
         if pos then
             old_place = deck
+            old_pos = pos
             animation = Animation.Grabbing
-            hand_latched = false
             hand_x = pos.x
             hand_y = pos.y
             break
@@ -256,28 +280,32 @@ function love.mousereleased(x, y, button, istouch, presses)
     local candidate = nil
     local distance = 1.0e10
     local hand_pos = Vector(hand_x, hand_y)
+    local candidate_pos = Vector(0, 0)
     for _, deck in ipairs(all_decks) do
         local deck_pos = deck:candrop(hand_x, hand_y)
         if deck_pos then
             local deck_distance = hand_pos:distance2(deck_pos)
             if deck_distance < distance then
                 candidate = deck
+                candidate_pos.x = deck_pos.x
+                candidate_pos.y = deck_pos.y
+                -- TODO: Process not acceptable places
+                if deck.covered then
+                    candidate_pos.y = candidate_pos.y + FLAT_OFFSET
+                end
                 distance = deck_distance
             end
         end
     end
     if candidate then
-        if candidate:trydrop(hand_x, hand_y, hand) then
-            cards.move_multiple(hand, candidate.cards)
-            ---@cast old_place FlatDeck
-            if old_place ~= candidate and old_place.covered ~= nil and old_place.covered >= #old_place.cards then
-                old_place.covered = #old_place.cards - 1
-            end
-            check_win()
-            return
-        end
+        target_deck = candidate
+        target_pos = candidate_pos
+        animation = Animation.Dropping
+        return
     end
     if old_place then
-        old_place:revert_drop(hand)
+        target_deck = old_place
+        target_pos = old_pos
+        animation = Animation.Returning
     end
 end
