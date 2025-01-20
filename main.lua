@@ -7,6 +7,7 @@ local decks = require "decks"
 local Vector = require "vector"
 local ui = require "ui"
 local settings = require "settings"
+local animlib = require "animation"
 
 ---@type Deck[]
 local all_decks
@@ -153,9 +154,7 @@ function love.update(dt)
             animation == Animation.Dropping or
             animation == Animation.Returning then
             local hand_vec = Vector(hand_x, hand_y)
-            if hand_vec:distance(target_pos) > HAND_MOVE_SPEED * dt then
-                local direction = hand_vec:direction(target_pos)
-                hand_vec = hand_vec + direction * HAND_MOVE_SPEED * dt
+            if not animlib.move(hand_vec, target_pos, dt) then
                 hand_x = hand_vec.x
                 hand_y = hand_vec.y
             else
