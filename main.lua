@@ -234,12 +234,9 @@ function love.mousepressed(x, y, button, istouch, presses)
         local home = homes[hand[1].suit]
         if (home:is_empty() and hand[1].rank == Rank.Ace) or
             (not home:is_empty() and hand[1].rank == home.cards[#home.cards].rank + 1) then
-            cards.move_single(hand, home.cards)
-            ---@cast old_place FlatDeck
-            if old_place and old_place.covered ~= nil and old_place.covered >= #old_place.cards then
-                old_place.covered = #old_place.cards - 1
-            end
-            check_win()
+            animation = Animation.Dropping
+            target_deck = home
+            target_pos = Vector(home.x, home.y)
         end
         since_last_mousedown = nil
     else
@@ -273,6 +270,8 @@ function love.mousereleased(x, y, button, istouch, presses)
     else
         ui.mouse_up("game", mx, my)
     end
+
+    if animation == Animation.Dropping then return end
 
     if #hand == 0 then return end
     ---@type Deck?
