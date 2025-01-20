@@ -1,7 +1,7 @@
 local module = {}
 
-local MIN_SPEED = 200
-local MAX_SPEED = 4000
+local MIN_SPEED = 300
+local MAX_SPEED = 5000
 local MAX_DISTANCE = math.sqrt(SCREEN_WIDTH * SCREEN_WIDTH + SCREEN_HEIGHT * SCREEN_HEIGHT)
 local SPEED_MUL = (MAX_SPEED - MIN_SPEED) / MAX_DISTANCE
 

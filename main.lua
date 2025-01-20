@@ -228,6 +228,7 @@ function love.mousepressed(x, y, button, istouch, presses)
         end
     end
 
+    -- TODO: fix grabbing other card during dblclick
     if since_last_mousedown and
         love.timer.getTime() - since_last_mousedown < DOUBLE_CLICK_TIME and
         #hand == 1 then
@@ -289,8 +290,7 @@ function love.mousereleased(x, y, button, istouch, presses)
                 candidate_pos.x = deck_pos.x
                 candidate_pos.y = deck_pos.y
                 candidate_acc = accept
-                -- TODO: Process not acceptable places
-                if deck.covered then
+                if deck.covered and not deck:is_empty() then
                     candidate_pos.y = candidate_pos.y + FLAT_OFFSET
                 end
                 distance = deck_distance
