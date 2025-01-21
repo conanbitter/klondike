@@ -84,6 +84,13 @@ local function check_win()
     print("Win!")
 end
 
+---@param anim Animation
+---@param fixed boolean?
+local function start_animation(anim, fixed)
+    animation = anim
+    animlib.start(fixed)
+end
+
 ---@param command string
 ---@param value any
 local function ui_callback(command, value)
@@ -221,7 +228,7 @@ function love.mousepressed(x, y, button, istouch, presses)
         if pos then
             old_place = deck
             old_pos = pos
-            animation = Animation.Grabbing
+            start_animation(Animation.Grabbing, true)
             hand_x = pos.x
             hand_y = pos.y
             break
@@ -235,7 +242,7 @@ function love.mousepressed(x, y, button, istouch, presses)
         local home = homes[hand[1].suit]
         if (home:is_empty() and hand[1].rank == Rank.Ace) or
             (not home:is_empty() and hand[1].rank == home.cards[#home.cards].rank + 1) then
-            animation = Animation.Dropping
+            start_animation(Animation.Dropping)
             target_deck = home
             target_pos = Vector(home.x, home.y)
         end
@@ -300,10 +307,10 @@ function love.mousereleased(x, y, button, istouch, presses)
     if candidate and candidate_acc == DropAccept.Accept then
         target_deck = candidate
         target_pos = candidate_pos
-        animation = Animation.Dropping
+        start_animation(Animation.Dropping)
     elseif old_place then
         target_deck = old_place
         target_pos = old_pos
-        animation = Animation.Returning
+        start_animation(Animation.Returning)
     end
 end
