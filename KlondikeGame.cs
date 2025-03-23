@@ -9,6 +9,8 @@ public class KlondikeGame : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
+    private Texture2D test;
+
     public KlondikeGame()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -24,6 +26,7 @@ public class KlondikeGame : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+        test = Content.Load<Texture2D>("sprites");
     }
 
     protected override void Update(GameTime gameTime)
@@ -37,6 +40,10 @@ public class KlondikeGame : Game
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
+
+        _spriteBatch.Begin();
+        _spriteBatch.Draw(test, Vector2.Zero, Color.White);
+        _spriteBatch.End();
 
         base.Draw(gameTime);
     }
