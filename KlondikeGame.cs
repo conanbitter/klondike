@@ -10,6 +10,7 @@ public class KlondikeGame : Game
     private SpriteBatch _spriteBatch;
 
     private Texture2D test;
+    private RenderTarget2D rt;
 
     public KlondikeGame()
     {
@@ -20,6 +21,10 @@ public class KlondikeGame : Game
 
     protected override void Initialize()
     {
+        _graphics.PreferredBackBufferWidth = 350 * 3;
+        _graphics.PreferredBackBufferHeight = 300 * 3;
+        _graphics.ApplyChanges();
+
         base.Initialize();
     }
 
@@ -27,6 +32,7 @@ public class KlondikeGame : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         test = Content.Load<Texture2D>("sprites");
+        rt = new RenderTarget2D(GraphicsDevice, 350, 300, false, GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
     }
 
     protected override void Update(GameTime gameTime)
@@ -39,10 +45,18 @@ public class KlondikeGame : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        GraphicsDevice.SetRenderTarget(rt);
 
-        _spriteBatch.Begin();
+        GraphicsDevice.Clear(new Color(62, 140, 54));
+
+        _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None);
         _spriteBatch.Draw(test, Vector2.Zero, Color.White);
+        _spriteBatch.End();
+
+        GraphicsDevice.SetRenderTarget(null);
+
+        _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None);
+        _spriteBatch.Draw(rt, new Rectangle(0, 0, 350 * 3, 300 * 3), Color.White);
         _spriteBatch.End();
 
         base.Draw(gameTime);
