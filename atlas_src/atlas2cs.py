@@ -20,5 +20,5 @@ with open("Atlas.template", 'r') as tm:
 template = Template(template_string)
 result = template.substitute(fields)
 
-with open("../Atlas.cs", 'w') as out:
+with open("../AtlasConstants.cs", 'w') as out:
     out.write(result)

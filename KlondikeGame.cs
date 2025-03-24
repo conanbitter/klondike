@@ -9,7 +9,6 @@ public class KlondikeGame : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
-    private Texture2D test;
     private RenderTarget2D rt;
 
     public KlondikeGame()
@@ -31,7 +30,7 @@ public class KlondikeGame : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        test = Content.Load<Texture2D>("sprites");
+        Atlas.Init(Content, _spriteBatch);
         rt = new RenderTarget2D(GraphicsDevice, 350, 300, false, GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
     }
 
@@ -50,7 +49,7 @@ public class KlondikeGame : Game
         GraphicsDevice.Clear(new Color(62, 140, 54));
 
         _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None);
-        _spriteBatch.Draw(test, Vector2.Zero, Atlas.Cards[1, 10], Color.White);
+        Atlas.Draw(new Vector2(10, 10), Atlas.Cards[1, 10]);
         _spriteBatch.End();
 
         GraphicsDevice.SetRenderTarget(null);
