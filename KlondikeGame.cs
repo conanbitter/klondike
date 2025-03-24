@@ -50,7 +50,7 @@ public class KlondikeGame : Game
         GraphicsDevice.Clear(new Color(62, 140, 54));
 
         _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None);
-        _spriteBatch.Draw(test, Vector2.Zero, Color.White);
+        _spriteBatch.Draw(test, Vector2.Zero, Atlas.Cards[1, 10], Color.White);
         _spriteBatch.End();
 
         GraphicsDevice.SetRenderTarget(null);
