@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -72,6 +73,8 @@ public class GameLayer
             }
         }
 
+        allCards.Shuffle();
+
         for (int i = 0; i < 8; i++)
         {
             int count = i + 1;
@@ -87,6 +90,22 @@ public class GameLayer
         foreach (Deck deck in allDecks)
         {
             deck.Draw();
+        }
+    }
+}
+
+static class Shuffler
+{
+    private static readonly Random rng = new();
+
+    public static void Shuffle<T>(this IList<T> list)
+    {
+        int n = list.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            (list[n], list[k]) = (list[k], list[n]);
         }
     }
 }
