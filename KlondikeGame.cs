@@ -11,11 +11,14 @@ public class KlondikeGame : Game
 
     private RenderTarget2D rt;
 
+    private readonly GameLayer gameLayer;
+
     public KlondikeGame()
     {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
+        gameLayer = new();
     }
 
     protected override void Initialize()
@@ -23,6 +26,8 @@ public class KlondikeGame : Game
         _graphics.PreferredBackBufferWidth = 350 * 3;
         _graphics.PreferredBackBufferHeight = 300 * 3;
         _graphics.ApplyChanges();
+
+        gameLayer.NewGame();
 
         base.Initialize();
     }
@@ -49,7 +54,8 @@ public class KlondikeGame : Game
         GraphicsDevice.Clear(new Color(62, 140, 54));
 
         _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None);
-        Atlas.Draw(new Vector2(10, 10), Atlas.Cards[1, 10]);
+        //Atlas.Draw(new Vector2(10, 10), Atlas.Cards[1, 10]);
+        gameLayer.Draw();
         _spriteBatch.End();
 
         GraphicsDevice.SetRenderTarget(null);

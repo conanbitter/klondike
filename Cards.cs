@@ -35,7 +35,7 @@ public static class Cards
 
     public static void Draw(Vector2 position, Card card)
     {
-        Atlas.Draw(position, Atlas.Cards[(int)card.Suit, (int)card.Rank]);
+        Atlas.Draw(position, Atlas.Cards[(int)card.Suit - 1, (int)card.Rank - 1]);
     }
 
     public static void Draw(Vector2 position, System.Collections.Generic.IEnumerable<Card> cards)
