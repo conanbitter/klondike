@@ -1,0 +1,173 @@
+using Microsoft.Xna.Framework;
+
+namespace klondike;
+
+static partial class Atlas
+{
+    // Cards
+
+    public static readonly Rectangle[,] Cards = new Rectangle[4, 13] {
+        // Hearts
+        {
+            new($card_1_01), // Ace
+            new($card_1_02), // Two
+            new($card_1_03), // Three
+            new($card_1_04), // Four
+            new($card_1_05), // Five
+            new($card_1_06), // Six
+            new($card_1_07), // Seven
+            new($card_1_08), // Eight
+            new($card_1_09), // Nine
+            new($card_1_10), // Ten
+            new($card_1_11), // Jack
+            new($card_1_12), // Queen
+            new($card_1_13), // King
+        },
+        // Diamonds
+        {
+            new($card_2_01), // Ace
+            new($card_2_02), // Two
+            new($card_2_03), // Three
+            new($card_2_04), // Four
+            new($card_2_05), // Five
+            new($card_2_06), // Six
+            new($card_2_07), // Seven
+            new($card_2_08), // Eight
+            new($card_2_09), // Nine
+            new($card_2_10), // Ten
+            new($card_2_11), // Jack
+            new($card_2_12), // Queen
+            new($card_2_13), // King
+        },
+        // Clubs
+        {
+            new($card_3_01), // Ace
+            new($card_3_02), // Two
+            new($card_3_03), // Three
+            new($card_3_04), // Four
+            new($card_3_05), // Five
+            new($card_3_06), // Six
+            new($card_3_07), // Seven
+            new($card_3_08), // Eight
+            new($card_3_09), // Nine
+            new($card_3_10), // Ten
+            new($card_3_11), // Jack
+            new($card_3_12), // Queen
+            new($card_3_13), // King
+        },
+        // Spades
+        {
+            new($card_4_01), // Ace
+            new($card_4_02), // Two
+            new($card_4_03), // Three
+            new($card_4_04), // Four
+            new($card_4_05), // Five
+            new($card_4_06), // Six
+            new($card_4_07), // Seven
+            new($card_4_08), // Eight
+            new($card_4_09), // Nine
+            new($card_4_10), // Ten
+            new($card_4_11), // Jack
+            new($card_4_12), // Queen
+            new($card_4_13), // King
+        }
+    };
+    public static readonly Rectangle CardBack = new($card_back);
+    public static readonly Rectangle PlaceholderEmpty = new($place_empty);
+    public static readonly Rectangle PlaceholderRefresh = new($place_reserve);
+    public static readonly Rectangle[] PlaceholderHomes = [
+        new($place_home_1), // Hearts
+        new($place_home_2), // Diamonds
+        new($place_home_3), // Clubs
+        new($place_home_4), // Spades
+    ];
+
+    // UI
+
+    public static readonly Rectangle LabelScaleEn = new($lbl_en_scale);
+    public static readonly Rectangle LabelScaleRu = new($lbl_ru_scale);
+
+    public static readonly Rectangle[] ButtonMenu = [
+        new($btn_menu_normal),
+        new($btn_menu_hover),
+        new($btn_menu_press),
+    ];
+
+    public static readonly Rectangle[] ButtonClose = [
+        new($btn_close_normal),
+        new($btn_close_hover),
+        new($btn_close_press),
+    ];
+
+    public static readonly Rectangle[] ButtonNewEn = [
+        new($btn_en_new_normal),
+        new($btn_en_new_hover),
+        new($btn_en_new_press),
+    ];
+
+    public static readonly Rectangle[] ButtonNewRu = [
+        new($btn_ru_new_normal),
+        new($btn_ru_new_hover),
+        new($btn_ru_new_press),
+    ];
+
+    public static readonly Rectangle[] ButtonQuitEn = [
+        new($btn_en_quit_normal),
+        new($btn_en_quit_hover),
+        new($btn_en_quit_press),
+    ];
+
+    public static readonly Rectangle[] ButtonQuitRu = [
+        new($btn_ru_quit_normal),
+        new($btn_ru_quit_hover),
+        new($btn_ru_quit_press),
+    ];
+
+    public static readonly Rectangle[,] OptionScale = new Rectangle[4, 4] {
+        // 1x
+        {
+            new($opt_1x_off),
+            new($opt_1x_on),
+            new($opt_1x_off_hover),
+            new($opt_1x_on_hover),
+        },
+        // 2x
+        {
+            new($opt_2x_off),
+            new($opt_2x_on),
+            new($opt_2x_off_hover),
+            new($opt_2x_on_hover),
+        },
+        // 3x
+        {
+            new($opt_3x_off),
+            new($opt_3x_on),
+            new($opt_3x_off_hover),
+            new($opt_3x_on_hover),
+        },
+        // 4x
+        {
+            new($opt_4x_off),
+            new($opt_4x_on),
+            new($opt_4x_off_hover),
+            new($opt_4x_on_hover),
+        },
+    };
+
+    public static readonly Rectangle[,] OptionLang = new Rectangle[2, 4] {
+        // EN
+        {
+            new($opt_en_off),
+            new($opt_en_on),
+            new($opt_en_off_hover),
+            new($opt_en_on_hover),
+        },
+        // RU
+        {
+            new($opt_ru_off),
+            new($opt_ru_on),
+            new($opt_ru_off_hover),
+            new($opt_ru_on_hover),
+        },
+    };
+}
