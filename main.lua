@@ -5,6 +5,7 @@ end
 local AdvancedMouse = require "mouse"
 local Pixels = require "pixels"
 local atlas = require "atlas"
+local cards = require "cards"
 
 ---@type AdvancedMouse
 local mouse = AdvancedMouse()
@@ -46,6 +47,7 @@ end
 
 function love.draw()
     pixels:begin()
+    cards.drawCard(cards.Card(cards.Suit.Spades, cards.Rank.Jack), 100, 100)
     atlas.draw(atlas.cards[2][3], 10, 10)
     pixels:finish()
 end
