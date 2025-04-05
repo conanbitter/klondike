@@ -3,10 +3,14 @@ if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
 end
 
 local AdvancedMouse = require "mouse"
+local Pixels = require "pixels"
 local atlas = require "atlas"
 
 ---@type AdvancedMouse
 local mouse = AdvancedMouse()
+
+---@type Pixels
+local pixels
 
 function mouse.onGrab(x, y)
     print("Grab", x, y)
@@ -31,6 +35,8 @@ end
 function love.load()
     love.graphics.setBackgroundColor(62 / 255, 140 / 255, 54 / 255)
     love.graphics.setDefaultFilter("nearest", "nearest")
+    pixels = Pixels()
+    pixels:setScale(3)
     atlas.init()
 end
 
@@ -39,7 +45,13 @@ function love.update(dt)
 end
 
 function love.draw()
+    pixels:begin()
     atlas.draw(atlas.cards[2][3], 10, 10)
+    pixels:finish()
+end
+
+function love.resize(width, height)
+    pixels:updateSize(width, height)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
