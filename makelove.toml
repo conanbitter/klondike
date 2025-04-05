@@ -10,7 +10,7 @@ love_files = [
     "-./readme.md",
     "-./icon.ico",
     "-./makelove.toml",
-    "-./atlas_src",
+    "-./atlas_src/*",
 ]
 
 [archive_files]
