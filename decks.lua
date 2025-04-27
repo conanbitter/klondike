@@ -61,7 +61,7 @@ function FlatDeck:new(x, y)
 end
 
 function FlatDeck:draw()
-
+    atlas.draw(self.placeholder, self.pos.x, self.pos.y)
 end
 
 --#endregion
@@ -82,7 +82,7 @@ function HomeDeck:new(x, y, suit)
 end
 
 function HomeDeck:draw()
-
+    atlas.draw(self.placeholder, self.pos.x, self.pos.y)
 end
 
 --#endregion
@@ -106,7 +106,13 @@ function ReserveDeck:new(x, y, suit)
 end
 
 function ReserveDeck:draw()
-
+    atlas.draw(self.placeholder, self.pos.x, self.pos.y)
 end
 
 --#endregion
+
+return {
+    FlatDeck = FlatDeck,
+    HomeDeck = HomeDeck,
+    ReserveDeck = ReserveDeck
+}

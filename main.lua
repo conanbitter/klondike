@@ -6,12 +6,16 @@ local AdvancedMouse = require "mouse"
 local Pixels = require "pixels"
 local atlas = require "atlas"
 local cards = require "cards"
+local Game = require "game"
 
 ---@type AdvancedMouse
 local mouse = AdvancedMouse()
 
 ---@type Pixels
 local pixels
+
+---@type Game
+local game
 
 function mouse.onGrab(x, y)
     print("Grab", x, y)
@@ -39,6 +43,7 @@ function love.load()
     pixels = Pixels()
     pixels:setScale(3)
     atlas.init()
+    game = Game()
 end
 
 function love.update(dt)
@@ -47,8 +52,7 @@ end
 
 function love.draw()
     pixels:begin()
-    cards.drawCard(cards.Card(cards.Suit.Spades, cards.Rank.Jack), 100, 100)
-    atlas.draw(atlas.cards[2][3], 10, 10)
+    game:draw()
     pixels:finish()
 end
 
