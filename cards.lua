@@ -54,5 +54,6 @@ return {
     Suit = Suit,
     Rank = Rank,
     Card = Card,
-    drawCard = drawCard
+    drawCard = drawCard,
+    FLAT_OFFSET = FLAT_OFFSET
 }

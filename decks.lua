@@ -1,6 +1,7 @@
 local Object = require "lib.classic"
 local Vec2 = require "geometry".Vec2
 local atlas = require "atlas"
+local cards = require "cards"
 
 --#region Deck
 
@@ -14,6 +15,7 @@ local atlas = require "atlas"
 ---@field boundsDblClick Rect?
 ---@field draw fun(self:Deck)
 ---@field clear fun(self:Deck)
+---@field is_empty fun(self:Deck):boolean
 ---@field onGrab fun(self:Deck, point:Vec2)
 ---@field onDrop fun(self:Deck, hand:Card[])
 ---@field onClick fun(self:Deck, point:Vec2)
@@ -35,6 +37,10 @@ end
 
 function Deck:clear()
     self.cards = {}
+end
+
+function Deck:is_empty()
+    return #self.cards == 0
 end
 
 function Deck:onGrab(point)
@@ -66,7 +72,16 @@ function FlatDeck:new(x, y)
 end
 
 function FlatDeck:draw()
-    atlas.draw(self.placeholder, self.pos.x, self.pos.y)
+    if self:is_empty() then
+        atlas.draw(self.placeholder, self.pos.x, self.pos.y)
+    end
+    for i, card in ipairs(self.cards) do
+        if i <= self.covered then
+            atlas.draw(atlas.card_back, self.pos.x, self.pos.y + (i - 1) * cards.FLAT_OFFSET)
+        else
+            cards.drawCard(card, self.pos.x, self.pos.y + (i - 1) * cards.FLAT_OFFSET)
+        end
+    end
 end
 
 --#endregion
