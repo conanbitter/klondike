@@ -8,6 +8,7 @@ local cards = require "cards"
 ---@field private homes HomeDeck[]
 ---@field private reserve ReserveDeck
 ---@field draw fun(self:Game)
+---@field new_game fun(self:Game)
 ---@overload fun():Game
 local Game = Object:extend()
 
@@ -41,6 +42,37 @@ function Game:draw()
     for _, deck in ipairs(self.decks) do
         deck:draw()
     end
+end
+
+---@param card_list Card[]
+local function shuffle(card_list)
+    for i = 1, #card_list - 1 do
+        local r = love.math.random(i, #card_list)
+        card_list[i], card_list[r] = card_list[r], card_list[i]
+    end
+end
+
+function Game:new_game()
+    for _, deck in ipairs(self.decks) do
+        deck:clear()
+    end
+
+    local main_deck = {}
+    for suit = 1, 4 do
+        for rank = 1, 13 do
+            table.insert(main_deck, cards.Card(suit, rank))
+        end
+    end
+    shuffle(main_deck)
+
+    for i, base_deck in ipairs(self.flatDecks) do
+        for j = 1, i do
+            table.insert(base_deck.cards, table.remove(main_deck))
+        end
+        base_deck.covered = #base_deck.cards - 1
+    end
+
+    self.reserve.cards = main_deck
 end
 
 return Game

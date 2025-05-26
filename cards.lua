@@ -33,7 +33,7 @@ local Rank = {
 ---@class Card
 ---@field suit Suit
 ---@field rank Rank
----@overload fun(suit:Suit,rank:Rank)
+---@overload fun(suit:Suit,rank:Rank):Card
 local Card = Object:extend()
 
 ---@param suit Suit

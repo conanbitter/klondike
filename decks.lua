@@ -13,6 +13,7 @@ local atlas = require "atlas"
 ---@field boundsClick Rect?
 ---@field boundsDblClick Rect?
 ---@field draw fun(self:Deck)
+---@field clear fun(self:Deck)
 ---@field onGrab fun(self:Deck, point:Vec2)
 ---@field onDrop fun(self:Deck, hand:Card[])
 ---@field onClick fun(self:Deck, point:Vec2)
@@ -30,6 +31,10 @@ function Deck:new(x, y, placeholder)
     self.boundsDrop = nil
     self.boundsClick = nil
     self.boundsDblClick = nil
+end
+
+function Deck:clear()
+    self.cards = {}
 end
 
 function Deck:onGrab(point)

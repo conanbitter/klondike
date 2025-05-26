@@ -44,6 +44,7 @@ function love.load()
     pixels:setScale(3)
     atlas.init()
     game = Game()
+    game:new_game()
 end
 
 function love.update(dt)
