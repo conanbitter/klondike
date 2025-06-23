@@ -9,6 +9,7 @@ local cards = require "cards"
 ---@field private reserve ReserveDeck
 ---@field draw fun(self:Game)
 ---@field new_game fun(self:Game)
+---@field debug number
 ---@overload fun():Game
 local Game = Object:extend()
 
@@ -36,11 +37,23 @@ function Game:new()
     for _, home in ipairs(self.homes) do
         table.insert(self.decks, home)
     end
+    self.debug = 0
 end
 
 function Game:draw()
     for _, deck in ipairs(self.decks) do
         deck:draw()
+    end
+
+    if self.debug == 1 then
+        love.graphics.setColor(1, 0.2, 0.2)
+        for _, deck in ipairs(self.decks) do
+            local bounds = deck.boundsGrab
+            if bounds then
+                love.graphics.rectangle("line", bounds.x, bounds.y, bounds.w, bounds.h)
+            end
+        end
+        love.graphics.setColor(1, 1, 1)
     end
 end
 

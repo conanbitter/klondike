@@ -53,6 +53,7 @@ end
 
 function love.draw()
     pixels:begin()
+    love.graphics.clear()
     game:draw()
     pixels:finish()
 end
@@ -71,4 +72,23 @@ end
 
 function love.mousereleased(x, y, button, istouch, presses)
     mouse:doMouseUp(x, y)
+end
+
+function love.keypressed(key, scancode, isrepeat)
+    if scancode == "1" then
+        print("[DEBUG] Show Grab rects")
+        game.debug = 1
+    elseif scancode == "2" then
+        print("[DEBUG] Show Drop rects")
+        game.debug = 2
+    elseif scancode == "3" then
+        print("[DEBUG] Show Click rects")
+        game.debug = 3
+    elseif scancode == "4" then
+        print("[DEBUG] Show DblClick rects")
+        game.debug = 4
+    elseif scancode == "0" then
+        print("[DEBUG] Hide rects")
+        game.debug = 0
+    end
 end
