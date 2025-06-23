@@ -45,6 +45,25 @@ function love.load()
     atlas.init()
     game = Game()
     game:new_game()
+
+    local tb1 = { cards.Card(1, 1), cards.Card(1, 2), cards.Card(1, 3), cards.Card(1, 4), cards.Card(1, 5) }
+    print("tb1 start")
+    PrintCardArray(tb1)
+    local tb2 = { cards.Card(2, 1), cards.Card(2, 2), cards.Card(2, 3), cards.Card(2, 4), cards.Card(2, 5) }
+    print("tb2 start")
+    PrintCardArray(tb2)
+    print("test top")
+    PrintCardSlice(cards.CardSlice.fromTop(tb1, 2))
+    print("test bottom")
+    PrintCardSlice(cards.CardSlice.fromBottom(tb1, 2))
+    local tbslice = cards.CardSlice(tb1, 3, 2)
+    print("slice")
+    PrintCardSlice(tbslice)
+    tbslice:move(tb2, 2)
+    print("tb1 end")
+    PrintCardArray(tb1)
+    print("tb2 end")
+    PrintCardArray(tb2)
 end
 
 function love.update(dt)
