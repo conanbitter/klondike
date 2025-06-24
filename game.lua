@@ -54,6 +54,33 @@ function Game:draw()
             end
         end
         love.graphics.setColor(1, 1, 1)
+    elseif self.debug == 2 then
+        love.graphics.setColor(1, 0.2, 0.2)
+        for _, deck in ipairs(self.decks) do
+            local bounds = deck.boundsDrop
+            if bounds then
+                love.graphics.rectangle("line", bounds.x, bounds.y, bounds.w, bounds.h)
+            end
+        end
+        love.graphics.setColor(1, 1, 1)
+    elseif self.debug == 3 then
+        love.graphics.setColor(1, 0.2, 0.2)
+        for _, deck in ipairs(self.decks) do
+            local bounds = deck.boundsClick
+            if bounds then
+                love.graphics.rectangle("line", bounds.x, bounds.y, bounds.w, bounds.h)
+            end
+        end
+        love.graphics.setColor(1, 1, 1)
+    elseif self.debug == 4 then
+        love.graphics.setColor(1, 0.2, 0.2)
+        for _, deck in ipairs(self.decks) do
+            local bounds = deck.boundsDblClick
+            if bounds then
+                love.graphics.rectangle("line", bounds.x, bounds.y, bounds.w, bounds.h)
+            end
+        end
+        love.graphics.setColor(1, 1, 1)
     end
 end
 
@@ -86,6 +113,10 @@ function Game:new_game()
     end
 
     self.reserve.cards = main_deck
+
+    for _, deck in ipairs(self.decks) do
+        deck:updateBounds()
+    end
 end
 
 return Game

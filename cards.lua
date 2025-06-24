@@ -123,5 +123,7 @@ return {
     Card = Card,
     CardSlice = CardSlice,
     drawCard = drawCard,
-    FLAT_OFFSET = FLAT_OFFSET
+    FLAT_OFFSET = FLAT_OFFSET,
+    CARD_WIDTH = CARD_WIDTH,
+    CARD_HEIGHT = CARD_HEIGHT
 }
