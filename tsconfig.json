@@ -7,11 +7,14 @@
         ],
         "moduleResolution": "Node",
         "types": [
+            "lua-types/jit",
             "love-typescript-definitions",
             "@typescript-to-lua/language-extensions"
         ],
         "strict": true,
-        "outDir": "build"
+        "outDir": "build",
+        "rootDir": "src",
+        "forceConsistentCasingInFileNames": true
     },
     "tstl": {
         "luaTarget": "JIT",

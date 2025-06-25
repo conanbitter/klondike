@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tstl",
-    "dev": "tstl --watch"
+    "dev": "tstl --watch",
+    "start": "love build --console"
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,7 @@
   "homepage": "https://github.com/conanbitter/klondike#readme",
   "devDependencies": {
     "love-typescript-definitions": "^11.5.1",
+    "lua-types": "^2.13.1",
     "typescript": "^5.8.2",
     "typescript-to-lua": "^1.31.2"
   }
