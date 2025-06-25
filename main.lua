@@ -7,6 +7,7 @@ local Pixels = require "pixels"
 local atlas = require "atlas"
 local cards = require "cards"
 local Game = require "game"
+local Vec2 = require "geometry".Vec2
 
 ---@type AdvancedMouse
 local mouse = AdvancedMouse()
@@ -31,6 +32,8 @@ end
 
 function mouse.onClick(x, y)
     --print("Click", x, y)
+    --local pos = pixels:posTo(Vec2(x, y))
+    --print("Click", pos.x, pos.y)
 end
 
 function mouse.onDblClick(x, y)
@@ -68,6 +71,7 @@ end
 
 function love.mousemoved(x, y, dx, dy, istouch)
     mouse:doMouseMove(x, y)
+    game.mousePos = pixels:posTo(Vec2(x, y))
 end
 
 function love.mousereleased(x, y, button, istouch, presses)

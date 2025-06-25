@@ -1,4 +1,5 @@
 local Object = require "lib.classic"
+local Vec2 = require "geometry".Vec2
 
 local defaultFlags = {
     minwidth = SCREEN_WIDTH,
@@ -18,6 +19,7 @@ local defaultFlags = {
 ---@field finish fun(self:Pixels)
 ---@field setScale fun(self:Pixels, newScale:number)
 ---@field updateSize fun(self:Pixels, width:number, height:number)
+---@field posTo fun(self:Pixels, pos:Vec2):Vec2
 ---@overload fun():Pixels
 local Pixels = Object:extend()
 
@@ -57,6 +59,12 @@ function Pixels:updateSize(width, height)
     self.posY = math.floor((height - SCREEN_HEIGHT * self.scale) / 2)
     self.oldWidth = width
     self.oldHeight = height
+end
+
+function Pixels:posTo(pos)
+    return Vec2(
+        math.floor((pos.x - self.posX) / self.scale),
+        math.floor((pos.y - self.posY) / self.scale))
 end
 
 return Pixels

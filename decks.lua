@@ -3,6 +3,7 @@ local Vec2 = require "geometry".Vec2
 local Rect = require "geometry".Rect
 local atlas = require "atlas"
 local cards = require "cards"
+local HandAnim = require "animations".HandAnim
 
 --#region Deck
 
@@ -14,7 +15,7 @@ local cards = require "cards"
 ---@field boundsDrop Rect?
 ---@field boundsClick Rect?
 ---@field boundsDblClick Rect?
----@field draw fun(self:Deck)
+---@field draw fun(self:Deck, animation:Animation)
 ---@field clear fun(self:Deck)
 ---@field updateBounds fun(self:Deck)
 ---@field is_empty fun(self:Deck):boolean
@@ -73,16 +74,33 @@ function FlatDeck:new(x, y)
     self.covered = 0
 end
 
-function FlatDeck:draw()
+---@param animation Animation
+function FlatDeck:draw(animation)
     if self:is_empty() then
         atlas.draw(self.placeholder, self.pos.x, self.pos.y)
+        return
     end
-    for i, card in ipairs(self.cards) do
-        if i <= self.covered then
-            atlas.draw(atlas.card_back, self.pos.x, self.pos.y + (i - 1) * cards.FLAT_OFFSET)
-        else
-            cards.drawCard(card, self.pos.x, self.pos.y + (i - 1) * cards.FLAT_OFFSET)
+
+    if animation == nil then
+        for i, card in ipairs(self.cards) do
+            if i <= self.covered then
+                atlas.draw(atlas.card_back, self.pos.x, self.pos.y + (i - 1) * cards.FLAT_OFFSET)
+            else
+                cards.drawCard(card, self.pos.x, self.pos.y + (i - 1) * cards.FLAT_OFFSET)
+            end
         end
+    elseif animation:is(HandAnim) then
+        for i, card in ipairs(self.cards) do
+            if i >= animation.cards.pos then
+                break
+            end
+            if i <= self.covered then
+                atlas.draw(atlas.card_back, self.pos.x, self.pos.y + (i - 1) * cards.FLAT_OFFSET)
+            else
+                cards.drawCard(card, self.pos.x, self.pos.y + (i - 1) * cards.FLAT_OFFSET)
+            end
+        end
+        cards.drawSlice(animation.cards, animation.pos.x, animation.pos.y)
     end
 end
 

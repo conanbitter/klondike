@@ -1,4 +1,7 @@
 local Object = require "lib.classic"
+local Vec2 = require "geometry".Vec2
+local CardSlice = require "cards".CardSlice
+local CARD_WIDTH = require "cards".CARD_WIDTH
 
 ---@class Animator
 ---@field animations table<Deck, Animation>
@@ -26,7 +29,7 @@ function Animator:update(game)
     end
 end
 
----@class Animation
+---@class Animation : Object
 ---@field parent Deck
 ---@field update fun(self:Animation, game:Game)
 ---@overload fun(parent:Deck):Animation
@@ -38,3 +41,27 @@ end
 
 function Animation:update(game)
 end
+
+---@class HandAnim : Animation
+---@field cards CardSlice
+---@field pos Vec2
+---@overload fun(parent:Deck, index:number):HandAnim
+local HandAnim = Animation:extend()
+
+---@param parent Deck
+---@param index number
+function HandAnim:new(parent, index)
+    HandAnim.super.new(self, parent)
+    self.pos = Vec2(0, 0)
+    self.cards = CardSlice.fromTop(parent, index)
+end
+
+---@param game Game
+function HandAnim:update(game)
+    self.pos.x = game.mousePos.x - CARD_WIDTH / 2
+    self.pos.y = game.mousePos.y
+end
+
+return {
+    HandAnim = HandAnim
+}

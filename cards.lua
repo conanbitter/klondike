@@ -98,6 +98,17 @@ function CardSlice:move(to, pos)
     self.pos = startpos
 end
 
+---@param slice CardSlice
+---@param x number
+---@param y number
+local function drawSlice(slice, x, y)
+    local ypos = y
+    for i = slice.pos, slice.pos + slice.count do
+        drawCard(slice.src[i], x, ypos)
+        ypos = ypos + FLAT_OFFSET
+    end
+end
+
 ---@param card Card
 function PrintCard(card)
     print("Card ", card.rank, card.suit)
@@ -123,6 +134,7 @@ return {
     Card = Card,
     CardSlice = CardSlice,
     drawCard = drawCard,
+    drawSlice = drawSlice,
     FLAT_OFFSET = FLAT_OFFSET,
     CARD_WIDTH = CARD_WIDTH,
     CARD_HEIGHT = CARD_HEIGHT

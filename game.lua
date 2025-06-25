@@ -7,6 +7,7 @@ local cards = require "cards"
 ---@field private flatDecks FlatDeck[]
 ---@field private homes HomeDeck[]
 ---@field private reserve ReserveDeck
+---@field mousePos Vec2
 ---@field draw fun(self:Game)
 ---@field new_game fun(self:Game)
 ---@field debug number
