@@ -1,2 +1,4 @@
 .vscode
 makelove-build
+node_modules
+build

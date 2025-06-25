@@ -1,0 +1,25 @@
+{
+  "name": "klondike",
+  "version": "0.0.1",
+  "description": "Yet another Klondike game",
+  "main": "index.js",
+  "scripts": {
+    "build": "tstl",
+    "dev": "tstl --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/conanbitter/klondike.git"
+  },
+  "author": "Conan Bitter",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/conanbitter/klondike/issues"
+  },
+  "homepage": "https://github.com/conanbitter/klondike#readme",
+  "devDependencies": {
+    "love-typescript-definitions": "^11.5.1",
+    "typescript": "^5.8.2",
+    "typescript-to-lua": "^1.31.2"
+  }
+}
