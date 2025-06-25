@@ -1,4 +1,3 @@
-import { Vec2 } from "./geometry";
 import * as atlas from "./atlas";
 import { Pixels } from "./pixels";
 
@@ -18,3 +17,7 @@ love.draw = () => {
     atlas.Draw(atlas.CARDS[0][2], 100, 100)
     pixels.finish();
 };
+
+love.resize = (width, height) => {
+    pixels.updateSize(width, height);
+}
