@@ -1,10 +1,10 @@
 import { Vec2 } from "./geometry";
+import * as atlas from "./atlas";
 
 love.load = () => {
-    const pos = new Vec2(2, 3);
-    print(pos.x, pos.y);
+    atlas.InitAtlas();
 }
 
 love.draw = () => {
-    love.graphics.print('Hello World');
+    atlas.Draw(atlas.CARDS[0][2], 100, 100)
 };

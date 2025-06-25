@@ -1,205 +1,191 @@
-local module = {}
+import { Image, Quad } from "love.graphics";
 
-local TEX_WIDTH = $_texture_width
-local TEX_HEIGHT = $_texture_height
+const TEX_WIDTH = $_texture_width;
+const TEX_HEIGHT = $_texture_height;
 
----@type love.Image
-local texture
+var texture: Image;
 
---#region Cards
+//#region "Cards"
 
----@type love.Quad[][]
-module.cards = {
-    --Hearts
-    {
-        love.graphics.newQuad($card_1_01, TEX_WIDTH, TEX_HEIGHT), --Ace
-        love.graphics.newQuad($card_1_02, TEX_WIDTH, TEX_HEIGHT), --Two
-        love.graphics.newQuad($card_1_03, TEX_WIDTH, TEX_HEIGHT), --Three
-        love.graphics.newQuad($card_1_04, TEX_WIDTH, TEX_HEIGHT), --Four
-        love.graphics.newQuad($card_1_05, TEX_WIDTH, TEX_HEIGHT), --Five
-        love.graphics.newQuad($card_1_06, TEX_WIDTH, TEX_HEIGHT), --Six
-        love.graphics.newQuad($card_1_07, TEX_WIDTH, TEX_HEIGHT), --Seven
-        love.graphics.newQuad($card_1_08, TEX_WIDTH, TEX_HEIGHT), --Eight
-        love.graphics.newQuad($card_1_09, TEX_WIDTH, TEX_HEIGHT), --Nine
-        love.graphics.newQuad($card_1_10, TEX_WIDTH, TEX_HEIGHT), --Ten
-        love.graphics.newQuad($card_1_11, TEX_WIDTH, TEX_HEIGHT), --Jack
-        love.graphics.newQuad($card_1_12, TEX_WIDTH, TEX_HEIGHT), --Queen
-        love.graphics.newQuad($card_1_13, TEX_WIDTH, TEX_HEIGHT), --King
-    },
-    --Diamonds
-    {
-        love.graphics.newQuad($card_2_01, TEX_WIDTH, TEX_HEIGHT), --Ace
-        love.graphics.newQuad($card_2_02, TEX_WIDTH, TEX_HEIGHT), --Two
-        love.graphics.newQuad($card_2_03, TEX_WIDTH, TEX_HEIGHT), --Three
-        love.graphics.newQuad($card_2_04, TEX_WIDTH, TEX_HEIGHT), --Four
-        love.graphics.newQuad($card_2_05, TEX_WIDTH, TEX_HEIGHT), --Five
-        love.graphics.newQuad($card_2_06, TEX_WIDTH, TEX_HEIGHT), --Six
-        love.graphics.newQuad($card_2_07, TEX_WIDTH, TEX_HEIGHT), --Seven
-        love.graphics.newQuad($card_2_08, TEX_WIDTH, TEX_HEIGHT), --Eight
-        love.graphics.newQuad($card_2_09, TEX_WIDTH, TEX_HEIGHT), --Nine
-        love.graphics.newQuad($card_2_10, TEX_WIDTH, TEX_HEIGHT), --Ten
-        love.graphics.newQuad($card_2_11, TEX_WIDTH, TEX_HEIGHT), --Jack
-        love.graphics.newQuad($card_2_12, TEX_WIDTH, TEX_HEIGHT), --Queen
-        love.graphics.newQuad($card_2_13, TEX_WIDTH, TEX_HEIGHT), --King
-    },
-    --Clubs
-    {
-        love.graphics.newQuad($card_3_01, TEX_WIDTH, TEX_HEIGHT), --Ace
-        love.graphics.newQuad($card_3_02, TEX_WIDTH, TEX_HEIGHT), --Two
-        love.graphics.newQuad($card_3_03, TEX_WIDTH, TEX_HEIGHT), --Three
-        love.graphics.newQuad($card_3_04, TEX_WIDTH, TEX_HEIGHT), --Four
-        love.graphics.newQuad($card_3_05, TEX_WIDTH, TEX_HEIGHT), --Five
-        love.graphics.newQuad($card_3_06, TEX_WIDTH, TEX_HEIGHT), --Six
-        love.graphics.newQuad($card_3_07, TEX_WIDTH, TEX_HEIGHT), --Seven
-        love.graphics.newQuad($card_3_08, TEX_WIDTH, TEX_HEIGHT), --Eight
-        love.graphics.newQuad($card_3_09, TEX_WIDTH, TEX_HEIGHT), --Nine
-        love.graphics.newQuad($card_3_10, TEX_WIDTH, TEX_HEIGHT), --Ten
-        love.graphics.newQuad($card_3_11, TEX_WIDTH, TEX_HEIGHT), --Jack
-        love.graphics.newQuad($card_3_12, TEX_WIDTH, TEX_HEIGHT), --Queen
-        love.graphics.newQuad($card_3_13, TEX_WIDTH, TEX_HEIGHT), --King
-    },
-    --Spades
-    {
-        love.graphics.newQuad($card_4_01, TEX_WIDTH, TEX_HEIGHT), --Ace
-        love.graphics.newQuad($card_4_02, TEX_WIDTH, TEX_HEIGHT), --Two
-        love.graphics.newQuad($card_4_03, TEX_WIDTH, TEX_HEIGHT), --Three
-        love.graphics.newQuad($card_4_04, TEX_WIDTH, TEX_HEIGHT), --Four
-        love.graphics.newQuad($card_4_05, TEX_WIDTH, TEX_HEIGHT), --Five
-        love.graphics.newQuad($card_4_06, TEX_WIDTH, TEX_HEIGHT), --Six
-        love.graphics.newQuad($card_4_07, TEX_WIDTH, TEX_HEIGHT), --Seven
-        love.graphics.newQuad($card_4_08, TEX_WIDTH, TEX_HEIGHT), --Eight
-        love.graphics.newQuad($card_4_09, TEX_WIDTH, TEX_HEIGHT), --Nine
-        love.graphics.newQuad($card_4_10, TEX_WIDTH, TEX_HEIGHT), --Ten
-        love.graphics.newQuad($card_4_11, TEX_WIDTH, TEX_HEIGHT), --Jack
-        love.graphics.newQuad($card_4_12, TEX_WIDTH, TEX_HEIGHT), --Queen
-        love.graphics.newQuad($card_4_13, TEX_WIDTH, TEX_HEIGHT), --King
-    }
-}
+export const CARDS = [
+    // Hearts
+    [
+        love.graphics.newQuad($card_1_01, TEX_WIDTH, TEX_HEIGHT), // Ace
+        love.graphics.newQuad($card_1_02, TEX_WIDTH, TEX_HEIGHT), // Two
+        love.graphics.newQuad($card_1_03, TEX_WIDTH, TEX_HEIGHT), // Three
+        love.graphics.newQuad($card_1_04, TEX_WIDTH, TEX_HEIGHT), // Four
+        love.graphics.newQuad($card_1_05, TEX_WIDTH, TEX_HEIGHT), // Five
+        love.graphics.newQuad($card_1_06, TEX_WIDTH, TEX_HEIGHT), // Six
+        love.graphics.newQuad($card_1_07, TEX_WIDTH, TEX_HEIGHT), // Seven
+        love.graphics.newQuad($card_1_08, TEX_WIDTH, TEX_HEIGHT), // Eight
+        love.graphics.newQuad($card_1_09, TEX_WIDTH, TEX_HEIGHT), // Nine
+        love.graphics.newQuad($card_1_10, TEX_WIDTH, TEX_HEIGHT), // Ten
+        love.graphics.newQuad($card_1_11, TEX_WIDTH, TEX_HEIGHT), // Jack
+        love.graphics.newQuad($card_1_12, TEX_WIDTH, TEX_HEIGHT), // Queen
+        love.graphics.newQuad($card_1_13, TEX_WIDTH, TEX_HEIGHT), // King
+    ],
+    // Diamonds
+    [
+        love.graphics.newQuad($card_2_01, TEX_WIDTH, TEX_HEIGHT), // Ace
+        love.graphics.newQuad($card_2_02, TEX_WIDTH, TEX_HEIGHT), // Two
+        love.graphics.newQuad($card_2_03, TEX_WIDTH, TEX_HEIGHT), // Three
+        love.graphics.newQuad($card_2_04, TEX_WIDTH, TEX_HEIGHT), // Four
+        love.graphics.newQuad($card_2_05, TEX_WIDTH, TEX_HEIGHT), // Five
+        love.graphics.newQuad($card_2_06, TEX_WIDTH, TEX_HEIGHT), // Six
+        love.graphics.newQuad($card_2_07, TEX_WIDTH, TEX_HEIGHT), // Seven
+        love.graphics.newQuad($card_2_08, TEX_WIDTH, TEX_HEIGHT), // Eight
+        love.graphics.newQuad($card_2_09, TEX_WIDTH, TEX_HEIGHT), // Nine
+        love.graphics.newQuad($card_2_10, TEX_WIDTH, TEX_HEIGHT), // Ten
+        love.graphics.newQuad($card_2_11, TEX_WIDTH, TEX_HEIGHT), // Jack
+        love.graphics.newQuad($card_2_12, TEX_WIDTH, TEX_HEIGHT), // Queen
+        love.graphics.newQuad($card_2_13, TEX_WIDTH, TEX_HEIGHT), // King
+    ],
+    // Clubs
+    [
+        love.graphics.newQuad($card_3_01, TEX_WIDTH, TEX_HEIGHT), // Ace
+        love.graphics.newQuad($card_3_02, TEX_WIDTH, TEX_HEIGHT), // Two
+        love.graphics.newQuad($card_3_03, TEX_WIDTH, TEX_HEIGHT), // Three
+        love.graphics.newQuad($card_3_04, TEX_WIDTH, TEX_HEIGHT), // Four
+        love.graphics.newQuad($card_3_05, TEX_WIDTH, TEX_HEIGHT), // Five
+        love.graphics.newQuad($card_3_06, TEX_WIDTH, TEX_HEIGHT), // Six
+        love.graphics.newQuad($card_3_07, TEX_WIDTH, TEX_HEIGHT), // Seven
+        love.graphics.newQuad($card_3_08, TEX_WIDTH, TEX_HEIGHT), // Eight
+        love.graphics.newQuad($card_3_09, TEX_WIDTH, TEX_HEIGHT), // Nine
+        love.graphics.newQuad($card_3_10, TEX_WIDTH, TEX_HEIGHT), // Ten
+        love.graphics.newQuad($card_3_11, TEX_WIDTH, TEX_HEIGHT), // Jack
+        love.graphics.newQuad($card_3_12, TEX_WIDTH, TEX_HEIGHT), // Queen
+        love.graphics.newQuad($card_3_13, TEX_WIDTH, TEX_HEIGHT), // King
+    ],
+    // Spades
+    [
+        love.graphics.newQuad($card_4_01, TEX_WIDTH, TEX_HEIGHT), // Ace
+        love.graphics.newQuad($card_4_02, TEX_WIDTH, TEX_HEIGHT), // Two
+        love.graphics.newQuad($card_4_03, TEX_WIDTH, TEX_HEIGHT), // Three
+        love.graphics.newQuad($card_4_04, TEX_WIDTH, TEX_HEIGHT), // Four
+        love.graphics.newQuad($card_4_05, TEX_WIDTH, TEX_HEIGHT), // Five
+        love.graphics.newQuad($card_4_06, TEX_WIDTH, TEX_HEIGHT), // Six
+        love.graphics.newQuad($card_4_07, TEX_WIDTH, TEX_HEIGHT), // Seven
+        love.graphics.newQuad($card_4_08, TEX_WIDTH, TEX_HEIGHT), // Eight
+        love.graphics.newQuad($card_4_09, TEX_WIDTH, TEX_HEIGHT), // Nine
+        love.graphics.newQuad($card_4_10, TEX_WIDTH, TEX_HEIGHT), // Ten
+        love.graphics.newQuad($card_4_11, TEX_WIDTH, TEX_HEIGHT), // Jack
+        love.graphics.newQuad($card_4_12, TEX_WIDTH, TEX_HEIGHT), // Queen
+        love.graphics.newQuad($card_4_13, TEX_WIDTH, TEX_HEIGHT), // King
+    ]
+]
 
----@type love.Quad
-module.card_back = love.graphics.newQuad($card_back, TEX_WIDTH, TEX_HEIGHT)
+export const CARD_BACK = love.graphics.newQuad($card_back, TEX_WIDTH, TEX_HEIGHT);
 
----@type love.Quad
-module.placeholder_empty = love.graphics.newQuad($place_empty, TEX_WIDTH, TEX_HEIGHT)
+export const PLACEHOLDER_EMPTY = love.graphics.newQuad($place_empty, TEX_WIDTH, TEX_HEIGHT);
 
----@type love.Quad
-module.placeholder_refresh = love.graphics.newQuad($place_reserve, TEX_WIDTH, TEX_HEIGHT)
+export const PLACEHOLDER_REFRESH = love.graphics.newQuad($place_reserve, TEX_WIDTH, TEX_HEIGHT);
 
----@type love.Quad[]
-module.placeholder_homes = {
-    love.graphics.newQuad($place_home_1, TEX_WIDTH, TEX_HEIGHT), --Hearts
-    love.graphics.newQuad($place_home_2, TEX_WIDTH, TEX_HEIGHT), --Diamonds
-    love.graphics.newQuad($place_home_3, TEX_WIDTH, TEX_HEIGHT), --Clubs
-    love.graphics.newQuad($place_home_4, TEX_WIDTH, TEX_HEIGHT), --Spades
-}
+export const PLACEHOLDER_HOMES = [
+    love.graphics.newQuad($place_home_1, TEX_WIDTH, TEX_HEIGHT), // Hearts
+    love.graphics.newQuad($place_home_2, TEX_WIDTH, TEX_HEIGHT), // Diamonds
+    love.graphics.newQuad($place_home_3, TEX_WIDTH, TEX_HEIGHT), // Clubs
+    love.graphics.newQuad($place_home_4, TEX_WIDTH, TEX_HEIGHT), // Spades
+];
 
---#endregion
+//#endregion
 
---#region UI
+//#region UI
 
----@type love.Quad
-module.label_scale_en = love.graphics.newQuad($lbl_en_scale, TEX_WIDTH, TEX_HEIGHT)
+export const LABEL_SCALE_EN = love.graphics.newQuad($lbl_en_scale, TEX_WIDTH, TEX_HEIGHT);
 
----@type love.Quad
-module.label_scale_ru = love.graphics.newQuad($lbl_ru_scale, TEX_WIDTH, TEX_HEIGHT)
+export const LABEL_SCALE_RU = love.graphics.newQuad($lbl_ru_scale, TEX_WIDTH, TEX_HEIGHT);
 
----@type love.Quad[]
-module.button_menu = {
+export const BUTTON_MENU = [
     love.graphics.newQuad($btn_menu_normal, TEX_WIDTH, TEX_HEIGHT),
     love.graphics.newQuad($btn_menu_hover, TEX_WIDTH, TEX_HEIGHT),
     love.graphics.newQuad($btn_menu_press, TEX_WIDTH, TEX_HEIGHT),
-}
+]
 
----@type love.Quad[]
-module.button_close = {
+export const BUTTON_CLOSE = [
     love.graphics.newQuad($btn_close_normal, TEX_WIDTH, TEX_HEIGHT),
     love.graphics.newQuad($btn_close_hover, TEX_WIDTH, TEX_HEIGHT),
     love.graphics.newQuad($btn_close_press, TEX_WIDTH, TEX_HEIGHT),
-}
+]
 
----@type love.Quad[]
-module.button_new_en = {
+export const BUTTON_NEW_EN = [
     love.graphics.newQuad($btn_en_new_normal, TEX_WIDTH, TEX_HEIGHT),
     love.graphics.newQuad($btn_en_new_hover, TEX_WIDTH, TEX_HEIGHT),
     love.graphics.newQuad($btn_en_new_press, TEX_WIDTH, TEX_HEIGHT),
-}
+]
 
----@type love.Quad[]
-module.button_new_ru = {
+export const BUTTON_NEW_RU = [
     love.graphics.newQuad($btn_ru_new_normal, TEX_WIDTH, TEX_HEIGHT),
     love.graphics.newQuad($btn_ru_new_hover, TEX_WIDTH, TEX_HEIGHT),
     love.graphics.newQuad($btn_ru_new_press, TEX_WIDTH, TEX_HEIGHT),
-}
+]
 
----@type love.Quad[]
-module.button_quit_en = {
+export const BUTTON_QUIT_EN = [
     love.graphics.newQuad($btn_en_quit_normal, TEX_WIDTH, TEX_HEIGHT),
     love.graphics.newQuad($btn_en_quit_hover, TEX_WIDTH, TEX_HEIGHT),
     love.graphics.newQuad($btn_en_quit_press, TEX_WIDTH, TEX_HEIGHT),
-}
+]
 
----@type love.Quad[]
-module.button_quit_ru = {
+export const BUTTON_QUIT_RU = [
     love.graphics.newQuad($btn_ru_quit_normal, TEX_WIDTH, TEX_HEIGHT),
     love.graphics.newQuad($btn_ru_quit_hover, TEX_WIDTH, TEX_HEIGHT),
     love.graphics.newQuad($btn_ru_quit_press, TEX_WIDTH, TEX_HEIGHT),
-}
+]
 
----@type love.Quad[][]
-module.option_scale = {
-    { --1x
+export const OPTION_SCALE = [
+    // 1x
+    [
         love.graphics.newQuad($opt_1x_off, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_1x_on, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_1x_off_hover, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_1x_on_hover, TEX_WIDTH, TEX_HEIGHT),
-    },
-    { --2x
+    ],
+    // 2x
+    [
+
         love.graphics.newQuad($opt_2x_off, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_2x_on, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_2x_off_hover, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_2x_on_hover, TEX_WIDTH, TEX_HEIGHT),
-    },
-    { --3x
+    ],
+    // 3x
+    [
         love.graphics.newQuad($opt_3x_off, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_3x_on, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_3x_off_hover, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_3x_on_hover, TEX_WIDTH, TEX_HEIGHT),
-    },
-    { --4x
+    ],
+    // 4x
+    [
         love.graphics.newQuad($opt_4x_off, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_4x_on, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_4x_off_hover, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_4x_on_hover, TEX_WIDTH, TEX_HEIGHT),
-    }
-}
+    ]
+]
 
----@type love.Quad[][]
-module.option_lang = {
-    { --EN
+export const OPTION_LANG = [
+    // EN
+    [
         love.graphics.newQuad($opt_en_off, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_en_on, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_en_off_hover, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_en_on_hover, TEX_WIDTH, TEX_HEIGHT),
-    },
-    { --RU
+    ],
+    // RU
+    [
         love.graphics.newQuad($opt_ru_off, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_ru_on, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_ru_off_hover, TEX_WIDTH, TEX_HEIGHT),
         love.graphics.newQuad($opt_ru_on_hover, TEX_WIDTH, TEX_HEIGHT),
-    }
+    ]
+]
+
+//#endregion
+
+export function InitAtlas() {
+    texture = love.graphics.newImage("sprites.png")
 }
 
---#endregion
-
-function module.init()
-    texture = love.graphics.newImage("sprites.png")
-end
-
----@param sprite love.Quad
----@param x number
----@param y number
-function module.draw(sprite, x, y)
+export function Draw(sprite: Quad, x: number, y: number) {
     love.graphics.draw(texture, sprite, x, y)
-end
-
-return module
+}

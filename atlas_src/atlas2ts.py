@@ -20,11 +20,11 @@ with open("sprites.atlas", 'r') as f:
 fields["_texture_width"] = size[0]
 fields["_texture_height"] = size[1]
 
-with open("Atlas.template", 'r') as tm:
+with open("atlas.template", 'r') as tm:
     template_string = tm.read()
 
 template = Template(template_string)
 result = template.substitute(fields)
 
-with open("../atlas.lua", 'w') as out:
+with open("../src/atlas.ts", 'w') as out:
     out.write(result)
