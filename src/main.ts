@@ -1,3 +1,7 @@
+if (os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1") {
+    require("lldebugger").start();
+}
+
 import * as atlas from "./atlas";
 import { Pixels } from "./pixels";
 

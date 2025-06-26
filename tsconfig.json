@@ -14,10 +14,14 @@
         "strict": true,
         "outDir": "build",
         "rootDir": "src",
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "sourceMap": true
     },
     "tstl": {
         "luaTarget": "JIT",
-        "sourceMapTraceback": true
+        "sourceMapTraceback": true,
+        "noResolvePaths": [
+            "lldebugger"
+        ]
     }
 }
