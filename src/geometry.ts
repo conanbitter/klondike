@@ -33,7 +33,7 @@ export class Vec2 {
     }
 }
 
-class Rect {
+export class Rect {
     x: number;
     y: number;
     w: number;
