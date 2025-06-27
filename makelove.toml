@@ -1,17 +1,7 @@
 name = "Klondike"
 default_targets = ["win64"]
-build_directory = "makelove-build"
+build_directory = "../published"
 love_version = "11.5"
-icon_file = "icon.ico"
+icon_file = "../icon.ico"
 
-love_files = [
-    "::git-ls-tree::",
-    "-*/.*",
-    "-./readme.md",
-    "-./icon.ico",
-    "-./makelove.toml",
-    "-./atlas_src/*",
-]
-
-[archive_files]
-"./lib/licenses" = "licenses"
+love_files = ["./*.lua", "./*.png"]

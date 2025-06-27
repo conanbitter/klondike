@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tstl",
     "dev": "tstl --watch",
-    "start": "love build --console"
+    "start": "love build --console",
+    "publish": "cd ./build && makelove --config \"../makelove.toml\""
   },
   "repository": {
     "type": "git",
