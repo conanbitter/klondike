@@ -4,10 +4,12 @@ if (os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1") {
 
 import * as atlas from "./atlas";
 import { Game } from "./game";
+import { AdvancedMouse } from "./mouse";
 import { Pixels } from "./pixels";
 
 let pixels: Pixels;
 let game: Game;
+let mouse: AdvancedMouse;
 
 love.load = () => {
     love.graphics.setBackgroundColor(62 / 255, 140 / 255, 54 / 255);
@@ -17,6 +19,7 @@ love.load = () => {
     atlas.InitAtlas();
     game = new Game();
     game.newGame();
+    mouse = new AdvancedMouse(game, pixels);
 }
 
 love.draw = () => {
@@ -57,3 +60,19 @@ love.keypressed = (key, scancode, isrepeat) => {
             break;
     }
 };
+
+love.update = (dt) => {
+    mouse.doUpdate();
+};
+
+love.mousepressed = (x, y, button, isTouch, presses) => {
+    mouse.doMouseDown(x, y);
+};
+
+love.mousemoved = (x, y, dx, dy, istouch) => {
+    mouse.doMouseMove(x, y);
+}
+
+love.mousereleased = (x, y, button, isTouch, presses) => {
+    mouse.doMouseUp(x, y);
+}

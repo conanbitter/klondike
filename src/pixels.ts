@@ -48,9 +48,9 @@ export class Pixels {
         this.oldHeight = height;
     }
 
-    posTo(pos: Vec2) {
+    posTo(x: number, y: number): Vec2 {
         return new Vec2(
-            math.floor((pos.x - this.posX) / this.scale),
-            math.floor((pos.y - this.posY) / this.scale));
+            math.floor((x - this.posX) / this.scale),
+            math.floor((y - this.posY) / this.scale));
     }
 }

@@ -107,4 +107,25 @@ export class Game {
             deck.updateBounds();
         }
     }
+
+    onGrab(pos: Vec2) {
+        print("Grab", pos.x, pos.y);
+    }
+
+    onDrag(pos: Vec2) {
+        print("Drag", pos.x, pos.y);
+        this.mousePos = pos;
+    }
+
+    onDrop(pos: Vec2) {
+        print("Drop", pos.x, pos.y);
+    }
+
+    onClick(pos: Vec2) {
+        print("Click", pos.x, pos.y);
+    }
+
+    onDblClick(pos: Vec2) {
+        print("DblClick", pos.x, pos.y);
+    }
 }
