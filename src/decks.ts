@@ -3,7 +3,7 @@ import { Card, CARD_HEIGHT, CARD_WIDTH, FLAT_OFFSET, Suit } from "./cards";
 import { Rect, Vec2 } from "./geometry";
 import * as atlas from "./atlas";
 
-abstract class Deck {
+export abstract class Deck {
     pos: Vec2;
     cards: Card[];
     placeholder: Quad;
@@ -54,7 +54,7 @@ export class FlatDeck extends Deck {
                 if (i <= this.covered) {
                     atlas.Draw(atlas.CARD_BACK, this.pos.x, this.pos.y + i * FLAT_OFFSET);
                 } else {
-                    card.draw(this.pos.x, this.pos.y + (i - 1) * FLAT_OFFSET);
+                    card.draw(this.pos.x, this.pos.y + i * FLAT_OFFSET);
                 }
             });
         }
@@ -69,9 +69,9 @@ export class FlatDeck extends Deck {
         else {
             this.boundsGrab = new Rect(
                 this.pos.x,
-                this.pos.y + FLAT_OFFSET * this.covered,
+                this.pos.y + FLAT_OFFSET * (this.covered + 1),
                 CARD_WIDTH,
-                CARD_HEIGHT + FLAT_OFFSET * (this.cards.length - this.covered)
+                CARD_HEIGHT + FLAT_OFFSET * (this.cards.length - this.covered - 2)
             );
             this.boundsDblClick = new Rect(
                 this.pos.x,
