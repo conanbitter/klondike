@@ -63,6 +63,7 @@ love.keypressed = (key, scancode, isrepeat) => {
 
 love.update = (dt) => {
     mouse.doUpdate();
+    game.update();
 };
 
 love.mousepressed = (x, y, button, isTouch, presses) => {

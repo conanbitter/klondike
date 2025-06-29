@@ -1,3 +1,4 @@
+import { Animator } from "./animations";
 import { Card, Suit } from "./cards";
 import { Deck, FlatDeck, HomeDeck, ReserveDeck } from "./decks";
 import { Vec2 } from "./geometry";
@@ -14,34 +15,36 @@ export class Game {
     flatDecks: FlatDeck[];
     homes: HomeDeck[];
     reserve: ReserveDeck;
+    animator: Animator;
     mousePos: Vec2;
     debugBounds: number;
 
     constructor() {
         this.flatDecks = [
-            new FlatDeck(2 + 50 * 0, 70),
-            new FlatDeck(2 + 50 * 1, 70),
-            new FlatDeck(2 + 50 * 2, 70),
-            new FlatDeck(2 + 50 * 3, 70),
-            new FlatDeck(2 + 50 * 4, 70),
-            new FlatDeck(2 + 50 * 5, 70),
-            new FlatDeck(2 + 50 * 6, 70)
+            new FlatDeck(2 + 50 * 0, 70, this),
+            new FlatDeck(2 + 50 * 1, 70, this),
+            new FlatDeck(2 + 50 * 2, 70, this),
+            new FlatDeck(2 + 50 * 3, 70, this),
+            new FlatDeck(2 + 50 * 4, 70, this),
+            new FlatDeck(2 + 50 * 5, 70, this),
+            new FlatDeck(2 + 50 * 6, 70, this)
         ]
         this.homes = [
-            new HomeDeck(152 + 50 * 0, 2, Suit.Hearts),
-            new HomeDeck(152 + 50 * 1, 2, Suit.Diamonds),
-            new HomeDeck(152 + 50 * 2, 2, Suit.Clubs),
-            new HomeDeck(152 + 50 * 3, 2, Suit.Spades)
+            new HomeDeck(152 + 50 * 0, 2, Suit.Hearts, this),
+            new HomeDeck(152 + 50 * 1, 2, Suit.Diamonds, this),
+            new HomeDeck(152 + 50 * 2, 2, Suit.Clubs, this),
+            new HomeDeck(152 + 50 * 3, 2, Suit.Spades, this)
         ]
-        this.reserve = new ReserveDeck(2, 2);
+        this.reserve = new ReserveDeck(2, 2, this);
         this.decks = [this.reserve, ...this.flatDecks, ...this.homes];
         this.debugBounds = 0;
         this.mousePos = new Vec2(0, 0);
+        this.animator = new Animator();
     }
 
     draw() {
         for (const deck of this.decks) {
-            deck.draw();
+            deck.draw(this.animator.getAnimation(deck));
         }
 
         switch (this.debugBounds) {
@@ -83,6 +86,10 @@ export class Game {
         }
     }
 
+    update() {
+        this.animator.update(this);
+    }
+
     newGame() {
         for (const deck of this.homes) {
             deck.clear();
@@ -109,23 +116,38 @@ export class Game {
     }
 
     onGrab(pos: Vec2) {
-        print("Grab", pos.x, pos.y);
+        for (const deck of this.decks) {
+            if (deck.boundsGrab && deck.boundsGrab.isInbounds(pos)) {
+                deck.onGrab(pos);
+            }
+        }
+        //print("Grab", pos.x, pos.y);
     }
 
     onDrag(pos: Vec2) {
-        print("Drag", pos.x, pos.y);
+        //print("Drag", pos.x, pos.y);
         this.mousePos = pos;
     }
 
     onDrop(pos: Vec2) {
-        print("Drop", pos.x, pos.y);
+        //print("Drop", pos.x, pos.y);
     }
 
     onClick(pos: Vec2) {
-        print("Click", pos.x, pos.y);
+        for (const deck of this.decks) {
+            if (deck.boundsClick && deck.boundsClick.isInbounds(pos)) {
+                deck.onClick(pos);
+            }
+        }
+        //print("Click", pos.x, pos.y);
     }
 
     onDblClick(pos: Vec2) {
-        print("DblClick", pos.x, pos.y);
+        for (const deck of this.decks) {
+            if (deck.boundsDblClick && deck.boundsDblClick.isInbounds(pos)) {
+                deck.onDblClick(pos);
+            }
+        }
+        //print("DblClick", pos.x, pos.y);
     }
 }

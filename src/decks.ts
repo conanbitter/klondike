@@ -2,6 +2,8 @@ import { Quad } from "love.graphics";
 import { Card, CARD_HEIGHT, CARD_WIDTH, FLAT_OFFSET, Suit } from "./cards";
 import { Rect, Vec2 } from "./geometry";
 import * as atlas from "./atlas";
+import { HandAnim } from "./animations";
+import { Game } from "./game";
 
 export abstract class Deck {
     pos: Vec2;
@@ -11,6 +13,7 @@ export abstract class Deck {
     boundsDrop?: Rect;
     boundsClick?: Rect;
     boundsDblClick?: Rect;
+    game: Game;
 
     abstract draw(animation?: any): void;
     abstract updateBounds(): void;
@@ -20,10 +23,11 @@ export abstract class Deck {
     onClick(point: Vec2) { }
     onDblClick(point: Vec2) { }
 
-    constructor(x: number, y: number, placeholder: Quad) {
+    constructor(x: number, y: number, placeholder: Quad, parent: Game) {
         this.pos = new Vec2(x, y);
         this.cards = [];
         this.placeholder = placeholder;
+        this.game = parent;
     }
 
     clear() {
@@ -38,8 +42,8 @@ export abstract class Deck {
 export class FlatDeck extends Deck {
     covered: number;
 
-    constructor(x: number, y: number) {
-        super(x, y, atlas.PLACEHOLDER_EMPTY);
+    constructor(x: number, y: number, parent: Game) {
+        super(x, y, atlas.PLACEHOLDER_EMPTY, parent);
         this.covered = 0;
     }
 
@@ -57,6 +61,8 @@ export class FlatDeck extends Deck {
                     card.draw(this.pos.x, this.pos.y + i * FLAT_OFFSET);
                 }
             });
+        } else if (animation instanceof HandAnim) {
+            animation.cards.draw(animation.pos.x, animation.pos.y);
         }
     }
 
@@ -82,13 +88,17 @@ export class FlatDeck extends Deck {
             this.boundsDrop = this.boundsDblClick;
         }
     }
+
+    onGrab(point: Vec2): void {
+        this.game.animator.setAnimation(this, new HandAnim(this, 2));
+    }
 }
 
 export class HomeDeck extends Deck {
     suit: Suit;
 
-    constructor(x: number, y: number, suit: Suit) {
-        super(x, y, atlas.PLACEHOLDER_HOMES[suit]);
+    constructor(x: number, y: number, suit: Suit, parent: Game) {
+        super(x, y, atlas.PLACEHOLDER_HOMES[suit], parent);
         this.suit = suit;
     }
 
@@ -120,8 +130,8 @@ export class ReserveDeck extends Deck {
     pos2: Vec2;
     index: number;
 
-    constructor(x: number, y: number) {
-        super(x, y, atlas.PLACEHOLDER_REFRESH);
+    constructor(x: number, y: number, parent: Game) {
+        super(x, y, atlas.PLACEHOLDER_REFRESH, parent);
         this.index = -1;
         this.pos2 = new Vec2(x + RESERVE_OFFSET, y);
     }
