@@ -53,10 +53,10 @@ export class HandAnim extends Animation {
     cards: CardSlice;
     pos: Vec2;
 
-    constructor(parent: Deck, count: number) {
+    constructor(parent: Deck, count: number, initPos: Vec2) {
         super(parent, 2);
         this.cards = CardSlice.fromTop(parent.cards, count);
-        this.pos = new Vec2(0, 0);
+        this.pos = initPos;
     }
 
     update(game: Game): void {
@@ -65,6 +65,6 @@ export class HandAnim extends Animation {
     }
 
     draw(): void {
-
+        this.cards.draw(this.pos.x, this.pos.y);
     }
 }

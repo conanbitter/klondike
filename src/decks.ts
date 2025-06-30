@@ -68,7 +68,14 @@ export class FlatDeck extends Deck {
                 }
             });
         } else if (animation instanceof HandAnim) {
-            animation.cards.draw(animation.pos.x, animation.pos.y);
+            this.cards.forEach((card, i) => {
+                if (i >= animation.cards.index) return;
+                if (i <= this.covered) {
+                    atlas.Draw(atlas.CARD_BACK, this.pos.x, this.pos.y + i * FLAT_OFFSET);
+                } else {
+                    card.draw(this.pos.x, this.pos.y + i * FLAT_OFFSET);
+                }
+            });
         }
     }
 
@@ -96,7 +103,7 @@ export class FlatDeck extends Deck {
     }
 
     onGrab(point: Vec2): void {
-        this.game.animator.setAnimation(this, new HandAnim(this, 2));
+        this.game.animator.setAnimation(this, new HandAnim(this, 2, point));
     }
 }
 
