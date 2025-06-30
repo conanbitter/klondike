@@ -3,11 +3,17 @@ import { Card, Suit } from "./cards";
 import { Deck, FlatDeck, HomeDeck, ReserveDeck } from "./decks";
 import { Vec2 } from "./geometry";
 
+const DRAWABLE_LAYERS = 10;
+
 function shuffle(cardList: Card[]) {
     for (const i of $range(0, cardList.length - 2)) {
         const r = love.math.random(i, cardList.length - 1);
         cardList[i], cardList[r] = cardList[r], cardList[i];
     }
+}
+
+export interface Drawable {
+    draw(): void;
 }
 
 export class Game {
@@ -18,8 +24,14 @@ export class Game {
     animator: Animator;
     mousePos: Vec2;
     debugBounds: number;
+    drawables: Drawable[][];
 
     constructor() {
+        this.drawables = new Array(DRAWABLE_LAYERS);
+        for (let i = 0; i <= DRAWABLE_LAYERS; i++) {
+            this.drawables[i] = [];
+        }
+
         this.flatDecks = [
             new FlatDeck(2 + 50 * 0, 70, this),
             new FlatDeck(2 + 50 * 1, 70, this),
@@ -39,12 +51,14 @@ export class Game {
         this.decks = [this.reserve, ...this.flatDecks, ...this.homes];
         this.debugBounds = 0;
         this.mousePos = new Vec2(0, 0);
-        this.animator = new Animator();
+        this.animator = new Animator(this);
     }
 
     draw() {
-        for (const deck of this.decks) {
-            deck.draw(this.animator.getAnimation(deck));
+        for (let i of $range(0, DRAWABLE_LAYERS)) {
+            for (const drawable of this.drawables[i]) {
+                drawable.draw();
+            }
         }
 
         switch (this.debugBounds) {
@@ -149,5 +163,16 @@ export class Game {
             }
         }
         //print("DblClick", pos.x, pos.y);
+    }
+
+    addDrawable(drawable: Drawable, layer: number) {
+        this.drawables[layer].push(drawable);
+    }
+
+    removeDrawable(drawable: Drawable) {
+        for (const layer of this.drawables) {
+            const index = layer.findIndex((value) => value == drawable);
+            if (index >= 0) layer.splice(index, 1);
+        }
     }
 }

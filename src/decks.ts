@@ -2,10 +2,10 @@ import { Quad } from "love.graphics";
 import { Card, CARD_HEIGHT, CARD_WIDTH, FLAT_OFFSET, Suit } from "./cards";
 import { Rect, Vec2 } from "./geometry";
 import * as atlas from "./atlas";
-import { HandAnim } from "./animations";
-import { Game } from "./game";
+import { Animation, HandAnim } from "./animations";
+import { Drawable, Game } from "./game";
 
-export abstract class Deck {
+export abstract class Deck implements Drawable {
     pos: Vec2;
     cards: Card[];
     placeholder: Quad;
@@ -15,7 +15,7 @@ export abstract class Deck {
     boundsDblClick?: Rect;
     game: Game;
 
-    abstract draw(animation?: any): void;
+    abstract drawAnim(animation?: Animation): void;
     abstract updateBounds(): void;
 
     onGrab(point: Vec2) { }
@@ -28,6 +28,12 @@ export abstract class Deck {
         this.cards = [];
         this.placeholder = placeholder;
         this.game = parent;
+        parent.addDrawable(this, 0);
+    }
+
+    draw(): void {
+        const animation = this.game.animator.getAnimation(this);
+        this.drawAnim(animation);
     }
 
     clear() {
@@ -47,7 +53,7 @@ export class FlatDeck extends Deck {
         this.covered = 0;
     }
 
-    draw(animation?: any): void {
+    drawAnim(animation?: Animation): void {
         if (this.isEmpty()) {
             atlas.Draw(this.placeholder, this.pos.x, this.pos.y);
             return;
@@ -102,7 +108,7 @@ export class HomeDeck extends Deck {
         this.suit = suit;
     }
 
-    draw(animation?: any): void {
+    drawAnim(animation?: Animation): void {
         if (this.isEmpty()) {
             atlas.Draw(this.placeholder, this.pos.x, this.pos.y);
         } else {
@@ -136,7 +142,7 @@ export class ReserveDeck extends Deck {
         this.pos2 = new Vec2(x + RESERVE_OFFSET, y);
     }
 
-    draw(animation?: any): void {
+    drawAnim(animation?: any): void {
         if (this.isEmpty()) {
             atlas.Draw(this.placeholder, this.pos.x, this.pos.y);
             return
