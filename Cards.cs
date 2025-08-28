@@ -33,20 +33,34 @@ public static class Cards
         King = 13
     }
 
-    public static void Draw(Vector2 position, Card card)
+    public static void Draw(Card card)
     {
-        Atlas.Draw(position, Atlas.Cards[(int)card.Suit - 1, (int)card.Rank - 1]);
+        if (!card.visible) return;
+
+        if (card.flipped)
+        {
+            Atlas.Draw(card.pos, Atlas.CardBack);
+        }
+        else
+        {
+            Atlas.Draw(card.pos, Atlas.Cards[(int)card.suit - 1, (int)card.rank - 1]);
+        }
     }
 
-    public static void Draw(Vector2 position, System.Collections.Generic.IEnumerable<Card> cards)
+    public static void Draw(System.Collections.Generic.IEnumerable<Card> cards)
     {
-        Vector2 currentPos = position;
         foreach (Card card in cards)
         {
-            Atlas.Draw(currentPos, Atlas.Cards[(int)card.Suit, (int)card.Rank]);
-            currentPos.Y += FlatOffset;
+            Draw(card);
         }
+    }
 
+    public static void Draw(Deck deck)
+    {
+        foreach (Card card in deck.cards)
+        {
+            Draw(card);
+        }
     }
 
     public static bool IsSuitCompatible(Suit suit1, Suit suit2)
@@ -62,4 +76,20 @@ public static class Cards
     }
 }
 
-public record Card(Cards.Suit Suit, Cards.Rank Rank);
+public class Card
+{
+    public readonly Cards.Suit suit;
+    public readonly Cards.Rank rank;
+
+    public Deck parent;
+
+    public Vector2 pos;
+    public bool flipped;
+    public bool visible;
+
+    public Card(Cards.Suit suit, Cards.Rank rank)
+    {
+        this.suit = suit;
+        this.rank = rank;
+    }
+}

@@ -14,50 +14,44 @@ public abstract class Deck(Vector2 pos, Rectangle placeholder)
     public List<Card> cards = [];
     public readonly Rectangle placeholder = placeholder;
 
-    public abstract void Draw();
+    public void Draw()
+    {
+        Atlas.Draw(pos, placeholder);
+        Cards.Draw(cards);
+    }
 }
 
 public class FlatDeck(Vector2 pos) : Deck(pos, Atlas.PlaceholderEmpty)
 {
-    public int covered = 0;
-
-    public override void Draw()
+    public void Arrange(bool resetFlip)
     {
-        if (cards.Count == 0)
+        if (cards.Count != 0)
         {
-            Atlas.Draw(pos, placeholder);
-        }
-        else
-        {
-            int i = 0;
+            Vector2 curPos = pos;
             foreach (Card card in cards)
             {
-                Vector2 curPos = new(pos.X, pos.Y + i * Cards.FlatOffset);
-                if (i <= covered)
-                {
-                    Atlas.Draw(curPos, Atlas.CardBack);
-                }
-                else
-                {
-                    Cards.Draw(curPos, card);
-                }
-                i++;
+                card.visible = true;
+                card.pos = curPos;
+                if (resetFlip) card.flipped = true;
+                curPos.Y += Cards.FlatOffset;
             }
+            if (resetFlip) cards[^1].flipped = false;
         }
     }
 }
 
 public class HomeDeck(Vector2 pos, Suit suit) : Deck(pos, Atlas.PlaceholderHomes[(int)suit - 1])
 {
-    public override void Draw()
+    public void Arrange()
     {
         if (cards.Count == 0)
         {
-            Atlas.Draw(pos, placeholder);
-        }
-        else
-        {
-            Cards.Draw(pos, cards.Last());
+            foreach (Card card in cards)
+            {
+                card.pos = pos;
+                card.visible = false;
+            }
+            cards[^1].visible = true;
         }
     }
 }
@@ -69,28 +63,9 @@ public class ReserveDeck(Vector2 pos) : Deck(pos, Atlas.PlaceholderRefresh)
 
     private const int ReserveOffset = 52;
 
-    public override void Draw()
+    public void Arrange()
     {
-        if (cards.Count == 0)
-        {
-            Atlas.Draw(pos, placeholder);
-        }
-        else
-        {
-            if (index < cards.Count - 1)
-            {
-                Atlas.Draw(pos, Atlas.CardBack);
-            }
-            else
-            {
-                Atlas.Draw(pos, placeholder);
-            }
 
-            if (index >= 0)
-            {
-                Cards.Draw(pos2, cards[index]);
-            }
-        }
     }
 }
 
@@ -99,6 +74,7 @@ public class GameLayer
     private readonly List<Deck> allDecks = [];
     private readonly List<FlatDeck> flatDecks = [];
     private readonly ReserveDeck reserve;
+    private List<Card> allCards;
 
     public GameLayer()
     {
@@ -116,11 +92,8 @@ public class GameLayer
 
         reserve = new(new Vector2(2, 2));
         allDecks.Add(reserve);
-    }
 
-    public void NewGame()
-    {
-        List<Card> allCards = new(4 * 13);
+        allCards = new(4 * 13);
         for (Suit suit = Suit.Hearts; suit <= Suit.Spades; suit++)
         {
             for (Rank rank = Rank.Ace; rank <= Rank.King; rank++)
@@ -128,19 +101,24 @@ public class GameLayer
                 allCards.Add(new Card(suit, rank));
             }
         }
+    }
 
+    public void NewGame()
+    {
         allCards.Shuffle();
+
+        int offset = 0;
 
         for (int i = 0; i < 8; i++)
         {
             int count = i + 1;
             flatDecks[i].cards.Clear();
-            flatDecks[i].cards.AddRange(allCards.TakeLast(count));
-            flatDecks[i].covered = i - 1;
-            allCards.RemoveRange(allCards.Count - count, count);
+            flatDecks[i].cards.AddRange(allCards.Skip(offset).Take(count));
+            offset += count;
+            flatDecks[i].Arrange(true);
         }
 
-        reserve.cards.AddRange(allCards);
+        reserve.cards.AddRange(allCards.Skip(offset));
     }
 
     public void Draw()
