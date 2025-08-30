@@ -33,6 +33,12 @@ public static class Cards
         King = 13
     }
 
+    public enum Layer : int
+    {
+        Background = 0,
+        Foreground = 0
+    }
+
     public static void Draw(Card card)
     {
         if (!card.visible) return;
@@ -86,10 +92,12 @@ public class Card
     public Vector2 pos;
     public bool flipped;
     public bool visible;
+    public Cards.Layer layer;
 
     public Card(Cards.Suit suit, Cards.Rank rank)
     {
         this.suit = suit;
         this.rank = rank;
+        layer = Cards.Layer.Background;
     }
 }

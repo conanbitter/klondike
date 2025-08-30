@@ -14,10 +14,17 @@ public abstract class Deck(Vector2 pos, Rectangle placeholder)
     public List<Card> cards = [];
     public readonly Rectangle placeholder = placeholder;
 
-    public void Draw()
+    public void Draw(Cards.Layer layer)
+    {
+        foreach (Card card in cards)
+        {
+            if (card.layer == layer) Cards.Draw(card);
+        }
+    }
+
+    public void DrawPlaceholder()
     {
         Atlas.Draw(pos, placeholder);
-        Cards.Draw(cards);
     }
 }
 
@@ -73,11 +80,22 @@ public class GameLayer
 {
     private readonly List<Deck> allDecks = [];
     private readonly List<FlatDeck> flatDecks = [];
+    private readonly List<HomeDeck> homeDecks = [];
     private readonly ReserveDeck reserve;
     private List<Card> allCards;
 
     public GameLayer()
     {
+        reserve = new(new Vector2(2, 2));
+        allDecks.Add(reserve);
+
+        for (Suit suit = Suit.Hearts; suit <= Suit.Spades; suit++)
+        {
+            HomeDeck newDeck = new(new Vector2(152 + 50 * ((int)suit - 1), 2), suit);
+            allDecks.Add(newDeck);
+            homeDecks.Add(newDeck);
+        }
+
         for (int i = 0; i < 8; i++)
         {
             FlatDeck newDeck = new(new Vector2(2 + 50 * (i - 1), 70));
@@ -85,13 +103,7 @@ public class GameLayer
             flatDecks.Add(newDeck);
         }
 
-        for (Suit suit = Suit.Hearts; suit <= Suit.Spades; suit++)
-        {
-            allDecks.Add(new HomeDeck(new Vector2(152 + 50 * ((int)suit - 1), 2), suit));
-        }
 
-        reserve = new(new Vector2(2, 2));
-        allDecks.Add(reserve);
 
         allCards = new(4 * 13);
         for (Suit suit = Suit.Hearts; suit <= Suit.Spades; suit++)
@@ -125,7 +137,17 @@ public class GameLayer
     {
         foreach (Deck deck in allDecks)
         {
-            deck.Draw();
+            deck.DrawPlaceholder();
+        }
+
+        foreach (Deck deck in allDecks)
+        {
+            deck.Draw(Cards.Layer.Background);
+        }
+
+        foreach (Deck deck in allDecks)
+        {
+            deck.Draw(Cards.Layer.Foreground);
         }
     }
 }
