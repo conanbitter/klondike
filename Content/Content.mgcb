@@ -25,3 +25,10 @@
 /processorParam:TextureFormat=Color
 /build:../atlas_src/sprites.png;sprites.png
 
+#begin mainfont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:mainfont.spritefont
+

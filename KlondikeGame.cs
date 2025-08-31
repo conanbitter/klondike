@@ -9,6 +9,8 @@ public class KlondikeGame : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
+    private SpriteFont debugFont;
+
     private RenderTarget2D rt;
 
     private readonly GameLayer gameLayer;
@@ -37,6 +39,7 @@ public class KlondikeGame : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         Atlas.Init(Content, _spriteBatch);
         rt = new RenderTarget2D(GraphicsDevice, 350, 300, false, GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
+        debugFont = Content.Load<SpriteFont>("mainfont");
     }
 
     protected override void Update(GameTime gameTime)
@@ -51,6 +54,8 @@ public class KlondikeGame : Game
 
     protected override void Draw(GameTime gameTime)
     {
+        Cards.DrawReset();
+
         GraphicsDevice.SetRenderTarget(rt);
 
         GraphicsDevice.Clear(new Color(62, 140, 54));
@@ -64,6 +69,10 @@ public class KlondikeGame : Game
 
         _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None);
         _spriteBatch.Draw(rt, new Rectangle(0, 0, 350 * 3, 300 * 3), Color.White);
+        _spriteBatch.End();
+
+        _spriteBatch.Begin();
+        _spriteBatch.DrawString(debugFont, $"Cards drawed: {Cards.DebugDrawed}", new Vector2(300, 10), Color.White);
         _spriteBatch.End();
 
         base.Draw(gameTime);

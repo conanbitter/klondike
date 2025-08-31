@@ -8,6 +8,8 @@ public static class Cards
     public static readonly int CardHeight = 60;
     public static readonly int FlatOffset = 14;
 
+    public static int DebugDrawed { get; private set; } = 0;
+
     public enum Suit : int
     {
         Hearts = 1,
@@ -36,7 +38,12 @@ public static class Cards
     public enum Layer : int
     {
         Background = 0,
-        Foreground = 0
+        Foreground = 1
+    }
+
+    public static void DrawReset()
+    {
+        DebugDrawed = 0;
     }
 
     public static void Draw(Card card)
@@ -51,6 +58,7 @@ public static class Cards
         {
             Atlas.Draw(card.pos, Atlas.Cards[(int)card.suit - 1, (int)card.rank - 1]);
         }
+        DebugDrawed++;
     }
 
     public static void Draw(System.Collections.Generic.IEnumerable<Card> cards)
