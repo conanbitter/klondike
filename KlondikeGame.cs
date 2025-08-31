@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -14,6 +15,8 @@ public class KlondikeGame : Game
     private RenderTarget2D rt;
 
     private readonly GameLayer gameLayer;
+
+    private float deltaTime;
 
     public KlondikeGame()
     {
@@ -47,6 +50,8 @@ public class KlondikeGame : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
+        deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        Animations.Update(deltaTime);
         gameLayer.Update();
 
         base.Update(gameTime);
@@ -73,6 +78,7 @@ public class KlondikeGame : Game
 
         _spriteBatch.Begin();
         _spriteBatch.DrawString(debugFont, $"Cards drawed: {Cards.DebugDrawed}", new Vector2(300, 10), Color.White);
+        _spriteBatch.DrawString(debugFont, $"deltaTime {deltaTime}", new Vector2(300, 30), Color.White);
         _spriteBatch.End();
 
         base.Draw(gameTime);

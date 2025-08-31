@@ -44,6 +44,14 @@ public abstract class Deck(Vector2 pos, Rectangle placeholder)
         }
         if (top != null) top.visible = true;
     }
+
+    public void ShowAll()
+    {
+        foreach (Card card in cards)
+        {
+            card.visible = true;
+        }
+    }
 }
 
 public class FlatDeck(Vector2 pos) : Deck(pos, Atlas.PlaceholderEmpty)
@@ -118,14 +126,12 @@ public class GameLayer
             homeDecks.Add(newDeck);
         }
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 7; i++)
         {
-            FlatDeck newDeck = new(new Vector2(2 + 50 * (i - 1), 70));
+            FlatDeck newDeck = new(new Vector2(2 + 50 * i, 70));
             allDecks.Add(newDeck);
             flatDecks.Add(newDeck);
         }
-
-
 
         allCards = new(4 * 13);
         for (Suit suit = Suit.Hearts; suit <= Suit.Spades; suit++)
@@ -141,19 +147,34 @@ public class GameLayer
     {
         allCards.Shuffle();
 
+        foreach (Card card in allCards)
+        {
+            card.pos = reserve.pos;
+            card.flipped = true;
+        }
+
         int offset = 0;
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 7; i++)
         {
             int count = i + 1;
             flatDecks[i].cards.Clear();
             flatDecks[i].cards.AddRange(allCards.Skip(offset).Take(count));
             offset += count;
-            flatDecks[i].Arrange(true);
+            //flatDecks[i].Arrange(true);
+            Vector2 curPos = flatDecks[i].pos;
+            foreach (Card card in flatDecks[i].cards)
+            {
+                //card.pos = curPos;
+                Animations.Add(new AnimCardMove(card, curPos));
+                curPos.Y += Cards.FlatOffset;
+            }
+            flatDecks[i].cards[^1].flipped = false;
         }
 
         reserve.cards.AddRange(allCards.Skip(offset));
-        reserve.Arrange();
+        //Animations.SkipAll();
+        //reserve.Arrange();
     }
 
     public void Draw()
@@ -182,6 +203,16 @@ public class GameLayer
         {
             deck.UpdateVisibility();
         }
+
+        foreach (Deck deck in flatDecks)
+        {
+            deck.ShowAll();
+        }
+
+        /*foreach (Card card in allCards)
+        {
+            card.visible = true;
+        }*/
     }
 }
 
