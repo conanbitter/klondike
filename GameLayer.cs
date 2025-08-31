@@ -168,7 +168,7 @@ public class GameLayer
             foreach (Card card in flatDecks[i].cards)
             {
                 //card.pos = curPos;
-                animCard.Add(new AnimCardMove(card, curPos));
+                animCard.Add(new AnimCardMoveFixed(card, curPos, 0.2f + 0.1f * i / 7.0f, Easing.EaseInOutCubic));
                 curPos.Y += Cards.FlatOffset;
             }
             //flatDecks[i].cards[^1].flipped = false;

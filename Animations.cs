@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
@@ -162,6 +163,96 @@ class AnimCardMove(Card card, Vector2 target) : Animation
         }
         dir.Normalize();
         card.pos += dir * dp;
+    }
+
+    protected override void OnSkip()
+    {
+        card.pos = target;
+    }
+}
+
+delegate float EasingFunction(float val);
+
+public static class Easing
+{
+    public static float Linear(float val)
+    {
+        return val;
+    }
+
+    public static float EaseOutCubic(float val)
+    {
+        return 1.0f - (float)Math.Pow(1.0 - val, 3.0);
+    }
+
+    public static float EaseOutQuint(float val)
+    {
+        return 1.0f - (float)Math.Pow(1.0 - val, 5.0);
+    }
+
+    public static float EaseOutCirc(float val)
+    {
+        return (float)Math.Sqrt(1.0 - Math.Pow(val - 1.0, 2.0));
+    }
+
+    public static float EaseInOutCubic(float val)
+    {
+        return val < 0.5f ? 4.0f * val * val * val : 1.0f - (float)Math.Pow(-2.0 * val + 2.0, 3.0) / 2.0f;
+    }
+
+    public static float EaseInOutQuint(float val)
+    {
+        return val < 0.5f ? 16.0f * val * val * val * val * val : 1.0f - (float)Math.Pow(-2.0 * val + 2.0, 5.0) / 2.0f;
+    }
+
+    public static float EaseInCubic(float val)
+    {
+        return val * val * val;
+    }
+
+    private const float EOB_C1 = 1.70158f;
+    private const float EOB_C3 = EOB_C1 + 1.0f;
+
+    public static float EaseOutBack(float val)
+    {
+        return 1.0f + EOB_C3 * (float)Math.Pow(val - 1.0, 3.0) + EOB_C1 * (float)Math.Pow(val - 1.0, 2.0);
+    }
+}
+
+
+class AnimCardMoveFixed(Card card, Vector2 target, float duration, EasingFunction easing) : Animation
+{
+    private readonly Card card = card;
+    private Vector2 target = target;
+    private Vector2 startPos;
+    private readonly float duration = duration;
+    private float currentTime = 0.0f;
+    private EasingFunction easing = easing;
+
+    protected override void OnStart()
+    {
+        card.layer = Cards.Layer.Foreground;
+        startPos = card.pos;
+    }
+
+    protected override void OnFinish()
+    {
+        card.layer = Cards.Layer.Background;
+    }
+
+    protected override void OnUpdate(float deltaTime)
+    {
+        currentTime += deltaTime;
+        if (currentTime >= duration)
+        {
+            card.pos = target;
+            Finish();
+            return;
+        }
+
+        float time = easing(currentTime / duration);
+
+        card.pos = startPos + (target - startPos) * time;
     }
 
     protected override void OnSkip()
