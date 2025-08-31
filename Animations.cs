@@ -227,7 +227,12 @@ class AnimCardMoveFixed(Card card, Vector2 target, float duration, EasingFunctio
     private Vector2 startPos;
     private readonly float duration = duration;
     private float currentTime = 0.0f;
-    private EasingFunction easing = easing;
+    private readonly EasingFunction easing = easing;
+
+    public void MoveTarget(Vector2 newTarget)
+    {
+        target = newTarget;
+    }
 
     protected override void OnStart()
     {
