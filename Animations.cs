@@ -4,23 +4,52 @@ using Microsoft.Xna.Framework;
 
 namespace klondike;
 
-// TODO Add AnimationStart, AnimationFinish
-abstract class Animation
+class Animation
 {
-    public bool Finished { get; protected set; } = false;
+    public bool Finished { get; private set; } = false;
 
-    public abstract void Update(float deltaTime);
-    public abstract void Skip();
+    private bool firstTime = true;
+
+    protected virtual void OnUpdate(float deltaTime) { }
+    protected virtual void OnSkip() { }
+    protected virtual void OnStart() { }
+    protected virtual void OnFinish() { }
+
+    public void Update(float deltaTime)
+    {
+        if (firstTime)
+        {
+            OnStart();
+            firstTime = false;
+        }
+        if (!Finished) OnUpdate(deltaTime);
+    }
+
+    public void Skip()
+    {
+        OnSkip();
+        Finish();
+    }
+
+    protected void Finish()
+    {
+        OnFinish();
+        Finished = true;
+    }
+
+    protected void Restart()
+    {
+        firstTime = true;
+        Finished = false;
+    }
 }
 
 class AnimParallel : Animation
 {
     readonly List<Animation> animations = [];
 
-    public override void Update(float deltaTime)
+    protected override void OnUpdate(float deltaTime)
     {
-        if (Finished) return;
-
         bool allFinished = true;
         foreach (Animation anim in animations)
         {
@@ -31,24 +60,23 @@ class AnimParallel : Animation
         if (allFinished)
         {
             animations.Clear();
-            Finished = true;
+            Finish();
         }
     }
 
-    public override void Skip()
+    protected override void OnSkip()
     {
         foreach (Animation anim in animations)
         {
             anim.Skip();
         }
         animations.Clear();
-        Finished = true;
     }
 
     public void Add(Animation newAnim)
     {
         animations.Add(newAnim);
-        Finished = false;
+        Restart();
     }
 }
 
@@ -57,10 +85,21 @@ class AnimSequential : Animation
     readonly Queue<Animation> animations = new();
     Animation current = null;
 
-    public override void Update(float deltaTime)
+    protected override void OnStart()
     {
-        if (Finished) return;
+        try
+        {
+            current = animations.Dequeue();
+        }
+        catch
+        {
+            Finish();
+            return;
+        }
+    }
 
+    protected override void OnUpdate(float deltaTime)
+    {
         if (current == null || current.Finished)
         {
             try
@@ -69,7 +108,7 @@ class AnimSequential : Animation
             }
             catch
             {
-                Finished = true;
+                Finish();
                 return;
             }
         }
@@ -77,7 +116,7 @@ class AnimSequential : Animation
         current.Update(deltaTime);
     }
 
-    public override void Skip()
+    protected override void OnSkip()
     {
         current?.Skip();
         foreach (Animation anim in animations)
@@ -85,13 +124,12 @@ class AnimSequential : Animation
             anim.Skip();
         }
         animations.Clear();
-        Finished = true;
     }
 
     public void Add(Animation newAnim)
     {
         animations.Enqueue(newAnim);
-        Finished = false;
+        Restart();
     }
 }
 
@@ -102,28 +140,33 @@ class AnimCardMove(Card card, Vector2 target) : Animation
 
     const float LINEAR_SPEED = 300;
 
-    public override void Update(float deltaTime)
+    protected override void OnStart()
     {
-        if (Finished) return;
         card.layer = Cards.Layer.Foreground;
+    }
+
+    protected override void OnFinish()
+    {
+        card.layer = Cards.Layer.Background;
+    }
+
+    protected override void OnUpdate(float deltaTime)
+    {
         float dp = LINEAR_SPEED * deltaTime;
         Vector2 dir = target - card.pos;
         if (dir.Length() < dp)
         {
             card.pos = target;
-            card.layer = Cards.Layer.Background;
-            Finished = true;
+            Finish();
             return;
         }
         dir.Normalize();
         card.pos += dir * dp;
     }
 
-    public override void Skip()
+    protected override void OnSkip()
     {
         card.pos = target;
-        card.layer = Cards.Layer.Background;
-        Finished = true;
     }
 }
 
@@ -131,16 +174,15 @@ class AnimCardFlip(Card card) : Animation
 {
     private readonly Card card = card;
 
-    public override void Update(float deltaTime)
+    protected override void OnUpdate(float deltaTime)
     {
         card.flipped = false;
-        Finished = true;
+        Finish();
     }
 
-    public override void Skip()
+    protected override void OnSkip()
     {
         card.flipped = false;
-        Finished = true;
     }
 }
 
