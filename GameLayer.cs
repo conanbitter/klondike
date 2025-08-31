@@ -26,6 +26,24 @@ public abstract class Deck(Vector2 pos, Rectangle placeholder)
     {
         Atlas.Draw(pos, placeholder);
     }
+
+    public void UpdateVisibility()
+    {
+        Card top = null;
+        foreach (Card card in cards)
+        {
+            if (card.pos == pos)
+            {
+                card.visible = false;
+                top = card;
+            }
+            else
+            {
+                card.visible = true;
+            }
+        }
+        if (top != null) top.visible = true;
+    }
 }
 
 public class FlatDeck(Vector2 pos) : Deck(pos, Atlas.PlaceholderEmpty)
@@ -72,7 +90,11 @@ public class ReserveDeck(Vector2 pos) : Deck(pos, Atlas.PlaceholderRefresh)
 
     public void Arrange()
     {
-
+        foreach (Card card in cards)
+        {
+            card.pos = pos;
+            card.flipped = true;
+        }
     }
 }
 
@@ -131,6 +153,7 @@ public class GameLayer
         }
 
         reserve.cards.AddRange(allCards.Skip(offset));
+        reserve.Arrange();
     }
 
     public void Draw()
@@ -148,6 +171,16 @@ public class GameLayer
         foreach (Deck deck in allDecks)
         {
             deck.Draw(Cards.Layer.Foreground);
+        }
+    }
+
+    public void Update()
+    {
+        reserve.UpdateVisibility();
+
+        foreach (Deck deck in homeDecks)
+        {
+            deck.UpdateVisibility();
         }
     }
 }
