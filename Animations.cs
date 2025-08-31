@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace klondike;
 
+// TODO Add AnimationStart, AnimationFinish
 abstract class Animation
 {
     public bool Finished { get; protected set; } = false;
@@ -99,16 +100,18 @@ class AnimCardMove(Card card, Vector2 target) : Animation
     private readonly Card card = card;
     private Vector2 target = target;
 
-    const float LINEAR_SPEED = 100;
+    const float LINEAR_SPEED = 300;
 
     public override void Update(float deltaTime)
     {
         if (Finished) return;
+        card.layer = Cards.Layer.Foreground;
         float dp = LINEAR_SPEED * deltaTime;
         Vector2 dir = target - card.pos;
         if (dir.Length() < dp)
         {
             card.pos = target;
+            card.layer = Cards.Layer.Background;
             Finished = true;
             return;
         }
@@ -119,6 +122,24 @@ class AnimCardMove(Card card, Vector2 target) : Animation
     public override void Skip()
     {
         card.pos = target;
+        card.layer = Cards.Layer.Background;
+        Finished = true;
+    }
+}
+
+class AnimCardFlip(Card card) : Animation
+{
+    private readonly Card card = card;
+
+    public override void Update(float deltaTime)
+    {
+        card.flipped = false;
+        Finished = true;
+    }
+
+    public override void Skip()
+    {
+        card.flipped = false;
         Finished = true;
     }
 }

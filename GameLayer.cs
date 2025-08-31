@@ -112,7 +112,7 @@ public class GameLayer
     private readonly List<FlatDeck> flatDecks = [];
     private readonly List<HomeDeck> homeDecks = [];
     private readonly ReserveDeck reserve;
-    private List<Card> allCards;
+    private readonly List<Card> allCards;
 
     public GameLayer()
     {
@@ -155,6 +155,8 @@ public class GameLayer
 
         int offset = 0;
 
+        AnimSequential animCard = new();
+
         for (int i = 0; i < 7; i++)
         {
             int count = i + 1;
@@ -166,11 +168,14 @@ public class GameLayer
             foreach (Card card in flatDecks[i].cards)
             {
                 //card.pos = curPos;
-                Animations.Add(new AnimCardMove(card, curPos));
+                animCard.Add(new AnimCardMove(card, curPos));
                 curPos.Y += Cards.FlatOffset;
             }
-            flatDecks[i].cards[^1].flipped = false;
+            //flatDecks[i].cards[^1].flipped = false;
+            animCard.Add(new AnimCardFlip(flatDecks[i].cards[^1]));
         }
+
+        Animations.Add(animCard);
 
         reserve.cards.AddRange(allCards.Skip(offset));
         //Animations.SkipAll();
