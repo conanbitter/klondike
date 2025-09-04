@@ -49,6 +49,13 @@ class AnimParallel : Animation
 {
     readonly List<Animation> animations = [];
 
+    public AnimParallel() { }
+
+    public AnimParallel(params Animation[] animations)
+    {
+        this.animations.AddRange(animations);
+    }
+
     protected override void OnUpdate(float deltaTime)
     {
         bool allFinished = true;
@@ -74,10 +81,11 @@ class AnimParallel : Animation
         animations.Clear();
     }
 
-    public void Add(Animation newAnim)
+    public AnimParallel Add(Animation newAnim)
     {
         animations.Add(newAnim);
         Restart();
+        return this;
     }
 }
 
@@ -85,6 +93,16 @@ class AnimSequential : Animation
 {
     readonly Queue<Animation> animations = new();
     Animation current = null;
+
+    public AnimSequential() { }
+
+    public AnimSequential(params Animation[] animations)
+    {
+        foreach (Animation anim in animations)
+        {
+            this.animations.Enqueue(anim);
+        }
+    }
 
     protected override void OnStart()
     {
@@ -127,10 +145,11 @@ class AnimSequential : Animation
         animations.Clear();
     }
 
-    public void Add(Animation newAnim)
+    public AnimSequential Add(Animation newAnim)
     {
         animations.Enqueue(newAnim);
         Restart();
+        return this;
     }
 }
 
