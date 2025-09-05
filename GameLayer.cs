@@ -175,9 +175,13 @@ public class GameLayer
             animCard.Add(new AnimCardFlip(flatDecks[i].cards[^1]));
         }
 
+        animCard.OnEnd += () =>
+        {
+            reserve.cards.AddRange(allCards.Skip(offset));
+        };
         Animations.Add(animCard);
 
-        reserve.cards.AddRange(allCards.Skip(offset));
+        //reserve.cards.AddRange(allCards.Skip(offset));
         //Animations.SkipAll();
         //reserve.Arrange();
     }

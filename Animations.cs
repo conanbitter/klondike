@@ -5,6 +5,8 @@ using Microsoft.Xna.Framework;
 
 namespace klondike;
 
+delegate void AnimationEndHandler();
+
 class Animation
 {
     public bool Finished { get; private set; } = false;
@@ -15,6 +17,8 @@ class Animation
     protected virtual void OnSkip() { }
     protected virtual void OnStart() { }
     protected virtual void OnFinish() { }
+
+    public event AnimationEndHandler OnEnd;
 
     public void Update(float deltaTime)
     {
@@ -35,6 +39,7 @@ class Animation
     protected void Finish()
     {
         OnFinish();
+        OnEnd?.Invoke();
         Finished = true;
     }
 
