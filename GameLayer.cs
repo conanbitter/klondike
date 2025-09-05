@@ -164,11 +164,11 @@ public class GameLayer
             flatDecks[i].cards.AddRange(allCards.Skip(offset).Take(count));
             offset += count;
             //flatDecks[i].Arrange(true);
-            Vector2 curPos = flatDecks[i].pos;
+            Vector2 curPos = Vector2.Zero;
             foreach (Card card in flatDecks[i].cards)
             {
                 //card.pos = curPos;
-                animCard.Add(new AnimCardMoveFixed(card, curPos, 0.2f + 0.1f * i / 7.0f, Easing.EaseInOutCubic));
+                animCard.Add(new AnimCardMoveFixed(card, curPos, 0.2f + 0.1f * i / 7.0f, Easing.EaseInOutCubic, flatDecks[i]));
                 curPos.Y += Cards.FlatOffset;
             }
             //flatDecks[i].cards[^1].flipped = false;

@@ -244,7 +244,7 @@ public static class Easing
 }
 
 
-class AnimCardMoveFixed(Card card, Vector2 target, float duration, EasingFunction easing) : Animation
+class AnimCardMoveFixed(Card card, Vector2 target, float duration, EasingFunction easing, Deck root = null) : Animation
 {
     private readonly Card card = card;
     private Vector2 target = target;
@@ -252,6 +252,15 @@ class AnimCardMoveFixed(Card card, Vector2 target, float duration, EasingFunctio
     private readonly float duration = duration;
     private float currentTime = 0.0f;
     private readonly EasingFunction easing = easing;
+    private readonly Deck root = root;
+
+    private Vector2 AbsTarget
+    {
+        get
+        {
+            return root != null ? root.pos + target : target;
+        }
+    }
 
     public void MoveTarget(Vector2 newTarget)
     {
@@ -272,21 +281,22 @@ class AnimCardMoveFixed(Card card, Vector2 target, float duration, EasingFunctio
     protected override void OnUpdate(float deltaTime)
     {
         currentTime += deltaTime;
+
         if (currentTime >= duration)
         {
-            card.pos = target;
+            card.pos = AbsTarget;
             Finish();
             return;
         }
 
         float time = easing(currentTime / duration);
 
-        card.pos = startPos + (target - startPos) * time;
+        card.pos = startPos + (AbsTarget - startPos) * time;
     }
 
     protected override void OnSkip()
     {
-        card.pos = target;
+        card.pos = AbsTarget;
     }
 }
 
