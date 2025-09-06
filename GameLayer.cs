@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
@@ -8,11 +9,12 @@ namespace klondike;
 using Suit = Cards.Suit;
 using Rank = Cards.Rank;
 
-public abstract class Deck(Vector2 pos, Rectangle placeholder)
+public abstract class Deck(Vector2 pos, Rectangle placeholder, GameLayer parent)
 {
     public Vector2 pos = pos;
     public List<Card> cards = [];
     public readonly Rectangle placeholder = placeholder;
+    private readonly GameLayer parent = parent;
 
     public void Draw(Cards.Layer layer)
     {
@@ -54,7 +56,7 @@ public abstract class Deck(Vector2 pos, Rectangle placeholder)
     }
 }
 
-public class FlatDeck(Vector2 pos) : Deck(pos, Atlas.PlaceholderEmpty)
+public class FlatDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.PlaceholderEmpty, parent)
 {
     public void Arrange(bool resetFlip)
     {
@@ -73,7 +75,7 @@ public class FlatDeck(Vector2 pos) : Deck(pos, Atlas.PlaceholderEmpty)
     }
 }
 
-public class HomeDeck(Vector2 pos, Suit suit) : Deck(pos, Atlas.PlaceholderHomes[(int)suit - 1])
+public class HomeDeck(Vector2 pos, Suit suit, GameLayer parent) : Deck(pos, Atlas.PlaceholderHomes[(int)suit - 1], parent)
 {
     public void Arrange()
     {
@@ -89,7 +91,7 @@ public class HomeDeck(Vector2 pos, Suit suit) : Deck(pos, Atlas.PlaceholderHomes
     }
 }
 
-public class ReserveDeck(Vector2 pos) : Deck(pos, Atlas.PlaceholderRefresh)
+public class ReserveDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.PlaceholderRefresh, parent)
 {
     public int index = -1;
     public Vector2 pos2 = new(pos.X + ReserveOffset, pos.Y);
@@ -116,19 +118,19 @@ public class GameLayer
 
     public GameLayer()
     {
-        reserve = new(new Vector2(2, 2));
+        reserve = new(new Vector2(2, 2), this);
         allDecks.Add(reserve);
 
         for (Suit suit = Suit.Hearts; suit <= Suit.Spades; suit++)
         {
-            HomeDeck newDeck = new(new Vector2(152 + 50 * ((int)suit - 1), 2), suit);
+            HomeDeck newDeck = new(new Vector2(152 + 50 * ((int)suit - 1), 2), suit, this);
             allDecks.Add(newDeck);
             homeDecks.Add(newDeck);
         }
 
         for (int i = 0; i < 7; i++)
         {
-            FlatDeck newDeck = new(new Vector2(2 + 50 * i, 70));
+            FlatDeck newDeck = new(new Vector2(2 + 50 * i, 70), this);
             allDecks.Add(newDeck);
             flatDecks.Add(newDeck);
         }
