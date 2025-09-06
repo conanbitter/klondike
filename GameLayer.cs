@@ -179,6 +179,11 @@ public class ReserveDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.Placeh
             card.flipped = true;
         }
     }
+
+    public override void UpdateBounds()
+    {
+        BoundsClick = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
+    }
 }
 
 public class GameLayer

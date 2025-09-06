@@ -12,6 +12,9 @@ public class KlondikeGame : Game
     private SpriteFont debugFont;
     private Texture2D debugTexture;
     private Color debugGrab = new(Color.Red, 0.5f);
+    private Color debugDrop = new(Color.Blue, 0.5f);
+    private Color debugClick = new(Color.Purple, 0.5f);
+    private Color debugDblClick = new(Color.OrangeRed, 0.5f);
     private int debugBounds = 0;
 
     private RenderTarget2D rt;
@@ -90,21 +93,21 @@ public class KlondikeGame : Game
         {
             foreach (Deck deck in gameLayer.allDecks)
             {
-                if (deck.BoundsDrop is { } bounds) _spriteBatch.Draw(debugTexture, bounds, debugGrab);
+                if (deck.BoundsDrop is { } bounds) _spriteBatch.Draw(debugTexture, bounds, debugDrop);
             }
         }
         if (debugBounds == 3)
         {
             foreach (Deck deck in gameLayer.allDecks)
             {
-                if (deck.BoundsClick is { } bounds) _spriteBatch.Draw(debugTexture, bounds, debugGrab);
+                if (deck.BoundsClick is { } bounds) _spriteBatch.Draw(debugTexture, bounds, debugClick);
             }
         }
         if (debugBounds == 4)
         {
             foreach (Deck deck in gameLayer.allDecks)
             {
-                if (deck.BoundsDblClick is { } bounds) _spriteBatch.Draw(debugTexture, bounds, debugGrab);
+                if (deck.BoundsDblClick is { } bounds) _spriteBatch.Draw(debugTexture, bounds, debugDblClick);
             }
         }
         _spriteBatch.End();
