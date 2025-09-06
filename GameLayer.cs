@@ -15,6 +15,12 @@ public abstract class Deck(Vector2 pos, Rectangle placeholder, GameLayer parent)
     public List<Card> cards = [];
     public readonly Rectangle placeholder = placeholder;
     private readonly GameLayer parent = parent;
+    public bool active = true;
+
+    public Rectangle? BoundsGrab { get; protected set; } = null;
+    public Rectangle? BoundsDrop { get; protected set; } = null;
+    public Rectangle? BoundsClick { get; protected set; } = null;
+    public Rectangle? BoundsDblClick { get; protected set; } = null;
 
     public void Draw(Cards.Layer layer)
     {
@@ -54,6 +60,14 @@ public abstract class Deck(Vector2 pos, Rectangle placeholder, GameLayer parent)
             card.visible = true;
         }
     }
+
+    public virtual void UpdateBounds()
+    {
+        BoundsGrab = null;
+        BoundsDrop = null;
+        BoundsClick = null;
+        BoundsDblClick = null;
+    }
 }
 
 public class FlatDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.PlaceholderEmpty, parent)
@@ -73,6 +87,45 @@ public class FlatDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.Placehold
             if (resetFlip) cards[^1].flipped = false;
         }
     }
+
+    public override void UpdateBounds()
+    {
+        if (cards.Count == 0)
+        {
+            BoundsGrab = null;
+            BoundsDrop = null;
+            BoundsDblClick = null;
+        }
+        else
+        {
+            int firstFaced = 0;
+            foreach (Card card in cards)
+            {
+                if (!card.flipped)
+                {
+                    break;
+                }
+                else
+                {
+                    firstFaced++;
+                }
+            }
+
+            BoundsGrab = new(
+                (int)pos.X,
+                (int)pos.Y + Cards.FlatOffset * firstFaced,
+                Cards.CardWidth,
+                Cards.CardHeight + Cards.FlatOffset * (cards.Count - firstFaced - 1)
+            );
+            BoundsDblClick = new(
+                (int)pos.X,
+                (int)pos.Y + Cards.FlatOffset * (cards.Count - 1),
+                Cards.CardWidth,
+                Cards.CardHeight
+            );
+            BoundsDrop = BoundsDblClick;
+        }
+    }
 }
 
 public class HomeDeck(Vector2 pos, Suit suit, GameLayer parent) : Deck(pos, Atlas.PlaceholderHomes[(int)suit - 1], parent)
@@ -87,6 +140,26 @@ public class HomeDeck(Vector2 pos, Suit suit, GameLayer parent) : Deck(pos, Atla
                 card.visible = false;
             }
             cards[^1].visible = true;
+        }
+    }
+
+    public override void UpdateBounds()
+    {
+        if (cards.Count < 13)
+        {
+            BoundsDrop = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
+        }
+        else
+        {
+            BoundsDrop = null;
+        }
+        if (cards.Count == 0)
+        {
+            BoundsGrab = null;
+        }
+        else
+        {
+            BoundsGrab = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
         }
     }
 }
@@ -110,7 +183,7 @@ public class ReserveDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.Placeh
 
 public class GameLayer
 {
-    private readonly List<Deck> allDecks = [];
+    public readonly List<Deck> allDecks = [];
     private readonly List<FlatDeck> flatDecks = [];
     private readonly List<HomeDeck> homeDecks = [];
     private readonly ReserveDeck reserve;
@@ -175,15 +248,25 @@ public class GameLayer
             }
             //flatDecks[i].cards[^1].flipped = false;
             animCard.Add(new AnimCardFlip(flatDecks[i].cards[^1]));
+            if (i == 5)
+            {
+                animCard.Add(new AnimCardFlip(flatDecks[i].cards[^2]));
+            }
+            if (i == 6)
+            {
+                animCard.Add(new AnimCardFlip(flatDecks[i].cards[^2]));
+                animCard.Add(new AnimCardFlip(flatDecks[i].cards[^3]));
+            }
         }
 
         animCard.OnEnd += () =>
         {
-            reserve.cards.AddRange(allCards.Skip(offset));
+            foreach (Deck deck in allDecks) deck.UpdateBounds();
         };
         Animations.Add(animCard);
+        Animations.SkipAll();
 
-        //reserve.cards.AddRange(allCards.Skip(offset));
+        reserve.cards.AddRange(allCards.Skip(offset));
         //Animations.SkipAll();
         //reserve.Arrange();
     }

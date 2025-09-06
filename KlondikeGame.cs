@@ -10,6 +10,9 @@ public class KlondikeGame : Game
     private SpriteBatch _spriteBatch;
 
     private SpriteFont debugFont;
+    private Texture2D debugTexture;
+    private Color debugGrab = new(Color.Red, 0.5f);
+    private int debugBounds = 0;
 
     private RenderTarget2D rt;
 
@@ -42,12 +45,21 @@ public class KlondikeGame : Game
         Atlas.Init(Content, _spriteBatch);
         rt = new RenderTarget2D(GraphicsDevice, 350, 300, false, GraphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
         debugFont = Content.Load<SpriteFont>("mainfont");
+
+        debugTexture = new Texture2D(GraphicsDevice, 1, 1);
+        debugTexture.SetData([Color.White]);
     }
 
     protected override void Update(GameTime gameTime)
     {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
+
+        if (Keyboard.GetState().IsKeyDown(Keys.D1)) debugBounds = 1;
+        if (Keyboard.GetState().IsKeyDown(Keys.D2)) debugBounds = 2;
+        if (Keyboard.GetState().IsKeyDown(Keys.D3)) debugBounds = 3;
+        if (Keyboard.GetState().IsKeyDown(Keys.D4)) debugBounds = 4;
+        if (Keyboard.GetState().IsKeyDown(Keys.D0)) debugBounds = 0;
 
         deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
         Animations.Update(deltaTime);
@@ -64,9 +76,37 @@ public class KlondikeGame : Game
 
         GraphicsDevice.Clear(new Color(62, 140, 54));
 
-        _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None);
+        _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.None);
         //Atlas.Draw(new Vector2(10, 10), Atlas.Cards[1, 10]);
         gameLayer.Draw();
+        if (debugBounds == 1)
+        {
+            foreach (Deck deck in gameLayer.allDecks)
+            {
+                if (deck.BoundsGrab is { } bounds) _spriteBatch.Draw(debugTexture, bounds, debugGrab);
+            }
+        }
+        if (debugBounds == 2)
+        {
+            foreach (Deck deck in gameLayer.allDecks)
+            {
+                if (deck.BoundsDrop is { } bounds) _spriteBatch.Draw(debugTexture, bounds, debugGrab);
+            }
+        }
+        if (debugBounds == 3)
+        {
+            foreach (Deck deck in gameLayer.allDecks)
+            {
+                if (deck.BoundsClick is { } bounds) _spriteBatch.Draw(debugTexture, bounds, debugGrab);
+            }
+        }
+        if (debugBounds == 4)
+        {
+            foreach (Deck deck in gameLayer.allDecks)
+            {
+                if (deck.BoundsDblClick is { } bounds) _spriteBatch.Draw(debugTexture, bounds, debugGrab);
+            }
+        }
         _spriteBatch.End();
 
         GraphicsDevice.SetRenderTarget(null);
