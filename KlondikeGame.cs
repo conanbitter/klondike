@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -65,6 +66,7 @@ public class KlondikeGame : Game
         if (Keyboard.GetState().IsKeyDown(Keys.D0)) debugBounds = 0;
 
         deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        AdvancedMouse.Update(gameTime.ElapsedGameTime.TotalSeconds);
         Animations.Update(deltaTime);
         gameLayer.Update();
 

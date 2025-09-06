@@ -221,6 +221,12 @@ public class GameLayer
                 allCards.Add(new Card(suit, rank));
             }
         }
+
+        AdvancedMouse.OnGrab += OnGrab;
+        AdvancedMouse.OnDrag += OnDrag;
+        AdvancedMouse.OnDrop += OnDrop;
+        AdvancedMouse.OnClick += OnClick;
+        AdvancedMouse.OnDblClick += OnDblClick;
     }
 
     public void NewGame()
@@ -312,6 +318,27 @@ public class GameLayer
         {
             card.visible = true;
         }*/
+    }
+
+    public void OnGrab(Point pos)
+    {
+        Console.WriteLine($"Grab     {pos.X,3} x {pos.Y,3}");
+    }
+    public void OnDrag(Point pos)
+    {
+        Console.WriteLine($"Drag     {pos.X,3} x {pos.Y,3}");
+    }
+    public void OnDrop(Point pos)
+    {
+        Console.WriteLine($"Drop     {pos.X,3} x {pos.Y,3}");
+    }
+    public void OnClick(Point pos)
+    {
+        Console.WriteLine($"Click    {pos.X,3} x {pos.Y,3}");
+    }
+    public void OnDblClick(Point pos)
+    {
+        Console.WriteLine($"DblClick {pos.X,3} x {pos.Y,3}");
     }
 }
 
