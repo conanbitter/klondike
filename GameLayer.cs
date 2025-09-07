@@ -164,7 +164,7 @@ public class HomeDeck(Vector2 pos, Suit suit, GameLayer parent) : Deck(pos, Atla
     }
 }
 
-public class ReserveDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.PlaceholderRefresh, parent)
+public class ReserveLeftDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.PlaceholderRefresh, parent)
 {
     public int index = -1;
     public Vector2 pos2 = new(pos.X + ReserveOffset, pos.Y);
@@ -186,18 +186,68 @@ public class ReserveDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.Placeh
     }
 }
 
+public class ReserveRightDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.PlaceholderEmpty, parent)
+{
+    public int index = -1;
+    public Vector2 pos2 = new(pos.X + ReserveOffset, pos.Y);
+
+    private const int ReserveOffset = 52;
+
+    public void Arrange()
+    {
+        foreach (Card card in cards)
+        {
+            card.pos = pos;
+            card.flipped = true;
+        }
+    }
+
+    public override void UpdateBounds()
+    {
+        BoundsClick = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
+    }
+}
+
+public class HandDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.PlaceholderEmpty, parent)
+{
+    public int index = -1;
+    public Vector2 pos2 = new(pos.X + ReserveOffset, pos.Y);
+
+    private const int ReserveOffset = 52;
+
+    public bool IsActive { get { return cards.Count > 0; } }
+
+    public void Arrange()
+    {
+        foreach (Card card in cards)
+        {
+            card.pos = pos;
+            card.flipped = true;
+        }
+    }
+
+    public override void UpdateBounds()
+    {
+        BoundsClick = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
+    }
+}
+
 public class GameLayer
 {
     public readonly List<Deck> allDecks = [];
     private readonly List<FlatDeck> flatDecks = [];
     private readonly List<HomeDeck> homeDecks = [];
-    private readonly ReserveDeck reserve;
+    private readonly ReserveLeftDeck reserveLeft;
+    private readonly ReserveRightDeck reserveRight;
+    private readonly HandDeck hand;
     private readonly List<Card> allCards;
 
     public GameLayer()
     {
-        reserve = new(new Vector2(2, 2), this);
-        allDecks.Add(reserve);
+        reserveLeft = new(new Vector2(2, 2), this);
+        allDecks.Add(reserveLeft);
+        reserveRight = new(new Vector2(2 + 50, 2), this);
+        allDecks.Add(reserveRight);
 
         for (Suit suit = Suit.Hearts; suit <= Suit.Spades; suit++)
         {
@@ -222,6 +272,9 @@ public class GameLayer
             }
         }
 
+        hand = new(Vector2.Zero, this);
+        allDecks.Add(hand);
+
         AdvancedMouse.OnGrab += OnGrab;
         AdvancedMouse.OnDrag += OnDrag;
         AdvancedMouse.OnDrop += OnDrop;
@@ -235,7 +288,7 @@ public class GameLayer
 
         foreach (Card card in allCards)
         {
-            card.pos = reserve.pos;
+            card.pos = reserveLeft.pos;
             card.flipped = true;
         }
 
@@ -277,7 +330,7 @@ public class GameLayer
         Animations.Add(animCard);
         Animations.SkipAll();
 
-        reserve.cards.AddRange(allCards.Skip(offset));
+        reserveLeft.cards.AddRange(allCards.Skip(offset));
         //Animations.SkipAll();
         //reserve.Arrange();
     }
@@ -286,7 +339,7 @@ public class GameLayer
     {
         foreach (Deck deck in allDecks)
         {
-            deck.DrawPlaceholder();
+            if (deck != hand) deck.DrawPlaceholder();
         }
 
         foreach (Deck deck in allDecks)
@@ -302,7 +355,8 @@ public class GameLayer
 
     public void Update()
     {
-        reserve.UpdateVisibility();
+        reserveLeft.UpdateVisibility();
+        reserveRight.UpdateVisibility();
 
         foreach (Deck deck in homeDecks)
         {
@@ -313,6 +367,8 @@ public class GameLayer
         {
             deck.ShowAll();
         }
+
+        if (hand.IsActive) hand.UpdateVisibility();
 
         /*foreach (Card card in allCards)
         {
@@ -326,6 +382,7 @@ public class GameLayer
     }
     public void OnDrag(Point pos)
     {
+        if (hand.IsActive) hand.pos = pos.ToVector2();
         Console.WriteLine($"Drag     {pos.X,3} x {pos.Y,3}");
     }
     public void OnDrop(Point pos)
