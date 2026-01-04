@@ -167,12 +167,10 @@ class AnimCardMove(Card card, Vector2 target) : Animation
 
     protected override void OnStart()
     {
-        card.layer = Cards.Layer.Foreground;
     }
 
     protected override void OnFinish()
     {
-        card.layer = Cards.Layer.Background;
     }
 
     protected override void OnUpdate(float deltaTime)
@@ -269,13 +267,12 @@ class AnimCardMoveFixed(Card card, Vector2 target, float duration, EasingFunctio
 
     protected override void OnStart()
     {
-        card.layer = Cards.Layer.Foreground;
         startPos = card.pos;
     }
 
     protected override void OnFinish()
     {
-        card.layer = Cards.Layer.Background;
+
     }
 
     protected override void OnUpdate(float deltaTime)

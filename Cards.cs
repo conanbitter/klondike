@@ -37,8 +37,11 @@ public static class Cards
 
     public enum Layer : int
     {
-        Background = 0,
-        Foreground = 1
+        Placeholder = 0,
+        DeckBottom = 1,
+        DeckTop = 2,
+        Flying = 3,
+        Hand = 4,
     }
 
     public static void DrawReset()
@@ -48,8 +51,6 @@ public static class Cards
 
     public static void Draw(Card card)
     {
-        if (!card.visible) return;
-
         if (card.flipped)
         {
             Atlas.Draw(card.pos, Atlas.CardBack);
@@ -90,22 +91,14 @@ public static class Cards
     }
 }
 
-public class Card
+public class Card(Cards.Suit suit, Cards.Rank rank)
 {
-    public readonly Cards.Suit suit;
-    public readonly Cards.Rank rank;
+    public readonly Cards.Suit suit = suit;
+    public readonly Cards.Rank rank = rank;
 
-    public Deck parent;
+    public Deck parent = null;
 
-    public Vector2 pos;
-    public bool flipped;
-    public bool visible;
-    public Cards.Layer layer;
-
-    public Card(Cards.Suit suit, Cards.Rank rank)
-    {
-        this.suit = suit;
-        this.rank = rank;
-        layer = Cards.Layer.Background;
-    }
+    public Vector2 pos = Vector2.Zero;
+    public bool flipped = true;
+    public Cards.Layer layer = Cards.Layer.DeckBottom;
 }
