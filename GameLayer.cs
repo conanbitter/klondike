@@ -138,15 +138,46 @@ public class GameLayer
 
     public void OnGrab(Point pos)
     {
+        foreach (Deck deck in allDecks)
+        {
+            if (deck.BoundsGrab != null && (bool)(deck.BoundsGrab?.Contains(pos)))
+            {
+                var cards = Deck.MoveCards(deck, hand);
+                foreach (Card card in cards)
+                {
+                    card.layer = Cards.Layer.Hand;
+                    card.pos = hand.pos;
+                }
+                hand.previousOwner = deck;
+                break;
+            }
+        }
         Console.WriteLine($"Grab     {pos.X,3} x {pos.Y,3}");
+        Console.WriteLine($"Hand     {hand.pos.X,3} x {hand.pos.Y,3}");
     }
     public void OnDrag(Point pos)
     {
-        if (hand.IsActive) hand.pos = pos.ToVector2();
+        if (hand.IsActive)
+        {
+            hand.pos = pos.ToVector2();
+            foreach (Card card in hand.cards)
+            {
+                card.pos = hand.pos;
+            }
+        }
         Console.WriteLine($"Drag     {pos.X,3} x {pos.Y,3}");
     }
     public void OnDrop(Point pos)
     {
+        if (hand.IsActive)
+        {
+            var cards = Deck.MoveCards(hand, hand.previousOwner, hand.cards.Count);
+            foreach (Card card in cards)
+            {
+                card.layer = Cards.Layer.DeckTop;
+                card.pos = hand.previousOwner.pos;
+            }
+        }
         Console.WriteLine($"Drop     {pos.X,3} x {pos.Y,3}");
     }
     public void OnClick(Point pos)

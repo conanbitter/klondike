@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 
 namespace klondike;
@@ -56,6 +57,27 @@ public abstract class Deck(Vector2 pos, Rectangle placeholder, GameLayer parent)
     public virtual Cards.Layer GetLayer(Card card)
     {
         return Cards.Layer.DeckTop;
+    }
+
+    public static IEnumerable<Card> MoveCards(Deck source, Deck destination, int count = 1)
+    {
+        if (count == 1)
+        {
+            Card card = source.cards[^1];
+            destination.cards.Add(card);
+            card.parent = destination;
+            source.cards.RemoveAt(source.cards.Count - 1);
+        }
+        else
+        {
+            var cards = source.cards.Skip(source.cards.Count - count);
+            foreach (Card card in cards)
+            {
+                card.parent = destination;
+            }
+            destination.cards.AddRange(source.cards.Skip(source.cards.Count - count));
+        }
+        return destination.cards.Skip(destination.cards.Count - count);
     }
 }
 
@@ -168,7 +190,14 @@ public class ReserveLeftDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.Pl
 
     public override void UpdateBounds()
     {
-        BoundsClick = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
+        if (cards.Count > 0)
+        {
+            BoundsClick = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
+        }
+        else
+        {
+            BoundsClick = null;
+        }
     }
 }
 
@@ -190,16 +219,20 @@ public class ReserveRightDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.P
 
     public override void UpdateBounds()
     {
-        BoundsClick = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
+        if (cards.Count > 0)
+        {
+            BoundsClick = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
+        }
+        else
+        {
+            BoundsClick = null;
+        }
     }
 }
 
 public class HandDeck(Vector2 pos, GameLayer parent) : Deck(pos, new Rectangle(), parent)
 {
-    public int index = -1;
-    public Vector2 pos2 = new(pos.X + ReserveOffset, pos.Y);
-
-    private const int ReserveOffset = 52;
+    public Deck previousOwner = null;
 
     public bool IsActive { get { return cards.Count > 0; } }
 
