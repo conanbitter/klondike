@@ -12,7 +12,7 @@ using Rank = Cards.Rank;
 public class GameLayer
 {
     public readonly List<Deck> allDecks = [];
-    private readonly List<LineDeck> flatDecks = [];
+    private readonly List<LineDeck> lineDecks = [];
     private readonly List<HomeDeck> homeDecks = [];
     private readonly ReserveLeftDeck reserveLeft;
     private readonly ReserveRightDeck reserveRight;
@@ -37,7 +37,7 @@ public class GameLayer
         {
             LineDeck newDeck = new(new Vector2(2 + 50 * i, 70), this);
             allDecks.Add(newDeck);
-            flatDecks.Add(newDeck);
+            lineDecks.Add(newDeck);
         }
 
         allCards = new(4 * 13);
@@ -50,7 +50,7 @@ public class GameLayer
         }
 
         hand = new(Vector2.Zero, this);
-        allDecks.Add(hand);
+        //allDecks.Add(hand);
 
         AdvancedMouse.OnGrab += OnGrab;
         AdvancedMouse.OnDrag += OnDrag;
@@ -67,6 +67,7 @@ public class GameLayer
         {
             card.pos = reserveLeft.pos;
             card.flipped = true;
+            card.layer = Cards.Layer.DeckBottom;
         }
 
         int offset = 0;
@@ -76,27 +77,28 @@ public class GameLayer
         for (int i = 0; i < 7; i++)
         {
             int count = i + 1;
-            flatDecks[i].cards.Clear();
-            flatDecks[i].cards.AddRange(allCards.Skip(offset).Take(count));
+            lineDecks[i].cards.Clear();
+            lineDecks[i].cards.AddRange(allCards.Skip(offset).Take(count));
             offset += count;
             //flatDecks[i].Arrange(true);
             Vector2 curPos = Vector2.Zero;
-            foreach (Card card in flatDecks[i].cards)
+            foreach (Card card in lineDecks[i].cards)
             {
                 //card.pos = curPos;
-                animCard.Add(new AnimCardMoveFixed(card, curPos, 0.2f + 0.1f * i / 7.0f, Easing.EaseInOutCubic, flatDecks[i]));
+                animCard.Add(new AnimCardMoveFixed(card, curPos, 0.2f + 0.1f * i / 7.0f, Easing.EaseInOutCubic, lineDecks[i]));
                 curPos.Y += Cards.FlatOffset;
+                card.layer = Cards.Layer.DeckTop;
             }
             //flatDecks[i].cards[^1].flipped = false;
-            animCard.Add(new AnimCardFlip(flatDecks[i].cards[^1]));
+            animCard.Add(new AnimCardFlip(lineDecks[i].cards[^1]));
             if (i == 5)
             {
-                animCard.Add(new AnimCardFlip(flatDecks[i].cards[^2]));
+                animCard.Add(new AnimCardFlip(lineDecks[i].cards[^2]));
             }
             if (i == 6)
             {
-                animCard.Add(new AnimCardFlip(flatDecks[i].cards[^2]));
-                animCard.Add(new AnimCardFlip(flatDecks[i].cards[^3]));
+                animCard.Add(new AnimCardFlip(lineDecks[i].cards[^2]));
+                animCard.Add(new AnimCardFlip(lineDecks[i].cards[^3]));
             }
         }
 
@@ -107,7 +109,8 @@ public class GameLayer
         Animations.Add(animCard);
 
         reserveLeft.cards.AddRange(allCards.Skip(offset));
-        //Animations.SkipAll();
+        reserveLeft.cards[^1].layer = Cards.Layer.DeckTop;
+        Animations.SkipAll();
         //reserve.Arrange();
     }
 
@@ -125,7 +128,7 @@ public class GameLayer
         // DeckBottom is not visible
         DrawLayer(Cards.Layer.DeckTop);
         DrawLayer(Cards.Layer.Flying);
-        DrawLayer(Cards.Layer.Hand);
+        if (hand.IsActive) hand.Draw(Cards.Layer.Hand);
     }
 
     public void Update()

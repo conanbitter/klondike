@@ -21,7 +21,7 @@ public abstract class Deck(Vector2 pos, Rectangle placeholder, GameLayer parent)
 
     public void Draw(Cards.Layer layer)
     {
-        if (layer == Cards.Layer.Placeholder && placeholder.Width > 0)
+        if (layer == Cards.Layer.Placeholder)
         {
             Atlas.Draw(pos, placeholder);
             return;
