@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
@@ -59,6 +60,11 @@ public abstract class Deck(Vector2 pos, Rectangle placeholder, GameLayer parent)
         return Cards.Layer.DeckTop;
     }
 
+    public virtual int GetGrabCount(int y)
+    {
+        return 1;
+    }
+
     public static IEnumerable<Card> MoveCards(Deck source, Deck destination, int count = 1)
     {
         if (count == 1)
@@ -76,6 +82,7 @@ public abstract class Deck(Vector2 pos, Rectangle placeholder, GameLayer parent)
                 card.parent = destination;
             }
             destination.cards.AddRange(source.cards.Skip(source.cards.Count - count));
+            source.cards.RemoveRange(source.cards.Count - count, count);
         }
         return destination.cards.Skip(destination.cards.Count - count);
     }
@@ -92,7 +99,7 @@ public class LineDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.Placehold
             {
                 card.pos = curPos;
                 if (resetFlip) card.flipped = true;
-                curPos.Y += Cards.FlatOffset;
+                curPos.Y += Cards.LineOffset;
             }
             if (resetFlip) cards[^1].flipped = false;
         }
@@ -123,18 +130,40 @@ public class LineDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.Placehold
 
             BoundsGrab = new(
                 (int)pos.X,
-                (int)pos.Y + Cards.FlatOffset * firstFaced,
+                (int)pos.Y + Cards.LineOffset * firstFaced,
                 Cards.CardWidth,
-                Cards.CardHeight + Cards.FlatOffset * (cards.Count - firstFaced - 1)
+                Cards.CardHeight + Cards.LineOffset * (cards.Count - firstFaced - 1)
             );
             BoundsDblClick = new(
                 (int)pos.X,
-                (int)pos.Y + Cards.FlatOffset * (cards.Count - 1),
+                (int)pos.Y + Cards.LineOffset * (cards.Count - 1),
                 Cards.CardWidth,
                 Cards.CardHeight
             );
             BoundsDrop = BoundsDblClick;
         }
+    }
+
+
+    public override Vector2 GetDesiredPos(Card card, bool relative)
+    {
+        int index = cards.IndexOf(card);
+        Vector2 cardPos = new(0, Cards.LineOffset * index);
+        if (relative)
+        {
+            return cardPos;
+        }
+        else
+        {
+            return cardPos + pos;
+        }
+    }
+
+    public override int GetGrabCount(int y)
+    {
+        int index = Math.Min((y - (int)pos.Y) / Cards.LineOffset, cards.Count - 1);
+        Console.WriteLine($"Index     {index,3} {y,3}");
+        return cards.Count - index;
     }
 }
 
@@ -248,5 +277,20 @@ public class HandDeck(Vector2 pos, GameLayer parent) : Deck(pos, new Rectangle()
     public override void UpdateBounds()
     {
         BoundsClick = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
+    }
+
+    public override Vector2 GetDesiredPos(Card card, bool relative)
+    {
+        float offset = cards.Count > 1 ? Cards.LineOffset / 2 : Cards.CardHeight / 2;
+        int index = cards.IndexOf(card);
+        Vector2 cardPos = new(-Cards.CardWidth / 2, -offset + Cards.LineOffset * index);
+        if (relative)
+        {
+            return cardPos;
+        }
+        else
+        {
+            return cardPos + pos;
+        }
     }
 }

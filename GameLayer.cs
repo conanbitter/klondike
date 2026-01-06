@@ -86,7 +86,7 @@ public class GameLayer
             {
                 //card.pos = curPos;
                 animCard.Add(new AnimCardMoveFixed(card, curPos, 0.2f + 0.1f * i / 7.0f, Easing.EaseInOutCubic, lineDecks[i]));
-                curPos.Y += Cards.FlatOffset;
+                curPos.Y += Cards.LineOffset;
                 card.layer = Cards.Layer.DeckTop;
             }
             //flatDecks[i].cards[^1].flipped = false;
@@ -140,13 +140,14 @@ public class GameLayer
     {
         foreach (Deck deck in allDecks)
         {
-            if (deck.BoundsGrab != null && (bool)(deck.BoundsGrab?.Contains(pos)))
+            if (deck.BoundsGrab is Rectangle rect && rect.Contains(pos))
             {
-                var cards = Deck.MoveCards(deck, hand);
+                hand.pos = pos.ToVector2();
+                var cards = Deck.MoveCards(deck, hand, deck.GetGrabCount(pos.Y));
                 foreach (Card card in cards)
                 {
                     card.layer = Cards.Layer.Hand;
-                    card.pos = hand.pos;
+                    card.pos = hand.GetDesiredPos(card, false);
                 }
                 hand.previousOwner = deck;
                 break;
@@ -162,7 +163,7 @@ public class GameLayer
             hand.pos = pos.ToVector2();
             foreach (Card card in hand.cards)
             {
-                card.pos = hand.pos;
+                card.pos = hand.GetDesiredPos(card, false);
             }
         }
         Console.WriteLine($"Drag     {pos.X,3} x {pos.Y,3}");
@@ -175,8 +176,9 @@ public class GameLayer
             foreach (Card card in cards)
             {
                 card.layer = Cards.Layer.DeckTop;
-                card.pos = hand.previousOwner.pos;
+                card.pos = hand.previousOwner.GetDesiredPos(card, false);
             }
+            hand.previousOwner.UpdateBounds();
         }
         Console.WriteLine($"Drop     {pos.X,3} x {pos.Y,3}");
     }

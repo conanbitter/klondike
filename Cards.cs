@@ -6,7 +6,7 @@ public static class Cards
 {
     public static readonly int CardWidth = 42;
     public static readonly int CardHeight = 60;
-    public static readonly int FlatOffset = 14;
+    public static readonly int LineOffset = 14;
 
     public static int DebugDrawed { get; private set; } = 0;
 
