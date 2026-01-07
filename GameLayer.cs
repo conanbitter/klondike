@@ -143,42 +143,60 @@ public class GameLayer
             if (deck.BoundsGrab is Rectangle rect && rect.Contains(pos))
             {
                 hand.pos = pos.ToVector2();
+                hand.IsFixed = false;
+                AnimParallel animContainer = new();
                 var cards = Deck.MoveCards(deck, hand, deck.GetGrabCount(pos.Y));
                 foreach (Card card in cards)
                 {
                     card.layer = Cards.Layer.Hand;
-                    card.pos = hand.GetDesiredPos(card, false);
+                    animContainer.Add(new AnimCardMoveDynamic(
+                        card,
+                        hand.GetDesiredPos(card, true),
+                        0.1f,
+                        hand));
                 }
                 hand.previousOwner = deck;
+                deck.ClearBounds();
+                animContainer.OnEnd += () => { hand.IsFixed = true; };
+                Animations.Add(animContainer);
                 break;
             }
         }
         Console.WriteLine($"Grab     {pos.X,3} x {pos.Y,3}");
         Console.WriteLine($"Hand     {hand.pos.X,3} x {hand.pos.Y,3}");
     }
+
     public void OnDrag(Point pos)
     {
         if (hand.IsActive)
         {
-            hand.pos = pos.ToVector2();
-            foreach (Card card in hand.cards)
-            {
-                card.pos = hand.GetDesiredPos(card, false);
-            }
+            hand.UpdatePos(pos.ToVector2());
         }
         Console.WriteLine($"Drag     {pos.X,3} x {pos.Y,3}");
     }
+
     public void OnDrop(Point pos)
     {
         if (hand.IsActive)
         {
             var cards = Deck.MoveCards(hand, hand.previousOwner, hand.cards.Count);
+            AnimParallel animContainer = new();
             foreach (Card card in cards)
             {
-                card.layer = Cards.Layer.DeckTop;
-                card.pos = hand.previousOwner.GetDesiredPos(card, false);
+                card.layer = Cards.Layer.Flying;
+                animContainer.Add(new AnimCardMoveFixed(
+                    card,
+                    hand.previousOwner.GetDesiredPos(card, false),
+                    0.2f,
+                    Easing.EaseInOutCubic));
+                //card.pos = hand.previousOwner.GetDesiredPos(card, false);
             }
-            hand.previousOwner.UpdateBounds();
+            animContainer.OnEnd += () =>
+            {
+                hand.previousOwner.SetLayers();
+                hand.previousOwner.UpdateBounds();
+            };
+            Animations.Add(animContainer);
         }
         Console.WriteLine($"Drop     {pos.X,3} x {pos.Y,3}");
     }

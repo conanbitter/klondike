@@ -297,6 +297,46 @@ class AnimCardMoveFixed(Card card, Vector2 target, float duration, EasingFunctio
     }
 }
 
+class AnimCardMoveDynamic(Card card, Vector2 target, float duration, Deck root) : Animation
+{
+    private readonly Card card = card;
+    private Vector2 target = target;
+    private readonly float duration = duration;
+    private float currentTime = 0.0f;
+    private readonly Deck root = root;
+
+    protected override void OnStart()
+    {
+
+    }
+
+    protected override void OnFinish()
+    {
+
+    }
+
+    protected override void OnUpdate(float deltaTime)
+    {
+        currentTime += deltaTime;
+
+        if (currentTime >= duration)
+        {
+            card.pos = root.pos + target;
+            Finish();
+            return;
+        }
+
+        float k = deltaTime / (duration - currentTime);
+
+        card.pos = card.pos * (1.0f - k) + (root.pos + target) * k;
+    }
+
+    protected override void OnSkip()
+    {
+        card.pos = root.pos + target;
+    }
+}
+
 class AnimCardFlip(Card card) : Animation
 {
     private readonly Card card = card;

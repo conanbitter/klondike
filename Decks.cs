@@ -35,6 +35,14 @@ public abstract class Deck(Vector2 pos, Rectangle placeholder, GameLayer parent)
         }
     }
 
+    public void ClearBounds()
+    {
+        BoundsGrab = null;
+        BoundsDrop = null;
+        BoundsClick = null;
+        BoundsDblClick = null;
+    }
+
     public virtual void UpdateBounds()
     {
         BoundsGrab = null;
@@ -58,6 +66,10 @@ public abstract class Deck(Vector2 pos, Rectangle placeholder, GameLayer parent)
     public virtual Cards.Layer GetLayer(Card card)
     {
         return Cards.Layer.DeckTop;
+    }
+
+    public virtual void SetLayers()
+    {
     }
 
     public virtual int GetGrabCount(int y)
@@ -165,6 +177,14 @@ public class LineDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.Placehold
         Console.WriteLine($"Index     {index,3} {y,3}");
         return cards.Count - index;
     }
+
+    public override void SetLayers()
+    {
+        foreach (Card card in cards)
+        {
+            card.layer = Cards.Layer.DeckTop;
+        }
+    }
 }
 
 public class HomeDeck(Vector2 pos, Suit suit, GameLayer parent) : Deck(pos, Atlas.PlaceholderHomes[(int)suit - 1], parent)
@@ -199,6 +219,15 @@ public class HomeDeck(Vector2 pos, Suit suit, GameLayer parent) : Deck(pos, Atla
             BoundsGrab = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
         }
     }
+
+    public override void SetLayers()
+    {
+        foreach (Card card in cards)
+        {
+            card.layer = Cards.Layer.DeckBottom;
+        }
+        cards[^1].layer = Cards.Layer.DeckTop;
+    }
 }
 
 public class ReserveLeftDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.PlaceholderRefresh, parent)
@@ -227,6 +256,15 @@ public class ReserveLeftDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.Pl
         {
             BoundsClick = null;
         }
+    }
+
+    public override void SetLayers()
+    {
+        foreach (Card card in cards)
+        {
+            card.layer = Cards.Layer.DeckBottom;
+        }
+        cards[^1].layer = Cards.Layer.DeckTop;
     }
 }
 
@@ -257,6 +295,15 @@ public class ReserveRightDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.P
             BoundsClick = null;
         }
     }
+
+    public override void SetLayers()
+    {
+        foreach (Card card in cards)
+        {
+            card.layer = Cards.Layer.DeckBottom;
+        }
+        cards[^1].layer = Cards.Layer.DeckTop;
+    }
 }
 
 public class HandDeck(Vector2 pos, GameLayer parent) : Deck(pos, new Rectangle(), parent)
@@ -264,6 +311,7 @@ public class HandDeck(Vector2 pos, GameLayer parent) : Deck(pos, new Rectangle()
     public Deck previousOwner = null;
 
     public bool IsActive { get { return cards.Count > 0; } }
+    public bool IsFixed = false;
 
     public void Arrange()
     {
@@ -271,6 +319,22 @@ public class HandDeck(Vector2 pos, GameLayer parent) : Deck(pos, new Rectangle()
         {
             card.pos = pos;
             card.flipped = true;
+        }
+    }
+
+    public void UpdatePos(Vector2 newPos)
+    {
+        pos = newPos;
+        if (IsFixed)
+        {
+            float y = -(cards.Count > 1 ? Cards.LineOffset / 2 : Cards.CardHeight / 2);
+            float x = -Cards.CardWidth / 2;
+            foreach (Card card in cards)
+            {
+                card.pos.X = pos.X + x;
+                card.pos.Y = pos.Y + y;
+                y += Cards.LineOffset;
+            }
         }
     }
 
