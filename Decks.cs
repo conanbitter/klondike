@@ -77,6 +77,11 @@ public abstract class Deck(Vector2 pos, Rectangle placeholder, GameLayer parent)
         return 1;
     }
 
+    public virtual bool CanDrop(Card card)
+    {
+        return false;
+    }
+
     public static IEnumerable<Card> MoveCards(Deck source, Deck destination, int count = 1)
     {
         if (count == 1)
@@ -122,7 +127,12 @@ public class LineDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.Placehold
         if (cards.Count == 0)
         {
             BoundsGrab = null;
-            BoundsDrop = null;
+            BoundsDrop = new(
+                (int)pos.X,
+                (int)pos.Y,
+                Cards.CardWidth,
+                Cards.CardHeight
+                );
             BoundsDblClick = null;
         }
         else
@@ -185,6 +195,19 @@ public class LineDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.Placehold
             card.layer = Cards.Layer.DeckTop;
         }
     }
+
+    public override bool CanDrop(Card card)
+    {
+        if (cards.Count > 0)
+        {
+            Card topCard = cards[^1];
+            return (topCard.rank - card.rank == 1) && Cards.IsSuitCompatible(card.suit, topCard.suit);
+        }
+        else
+        {
+            return true;
+        }
+    }
 }
 
 public class HomeDeck(Vector2 pos, Suit suit, GameLayer parent) : Deck(pos, Atlas.PlaceholderHomes[(int)suit - 1], parent)
@@ -226,7 +249,20 @@ public class HomeDeck(Vector2 pos, Suit suit, GameLayer parent) : Deck(pos, Atla
         {
             card.layer = Cards.Layer.DeckBottom;
         }
-        cards[^1].layer = Cards.Layer.DeckTop;
+        if (cards.Count > 0) cards[^1].layer = Cards.Layer.DeckTop;
+    }
+
+    public override bool CanDrop(Card card)
+    {
+        if (cards.Count > 0)
+        {
+            Card topCard = cards[^1];
+            return (card.rank - topCard.rank == 1) && (card.suit == suit);
+        }
+        else
+        {
+            return (card.rank == Cards.Rank.Ace) && (card.suit == suit);
+        }
     }
 }
 
@@ -264,7 +300,7 @@ public class ReserveLeftDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.Pl
         {
             card.layer = Cards.Layer.DeckBottom;
         }
-        cards[^1].layer = Cards.Layer.DeckTop;
+        if (cards.Count > 0) cards[^1].layer = Cards.Layer.DeckTop;
     }
 }
 
@@ -302,7 +338,7 @@ public class ReserveRightDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.P
         {
             card.layer = Cards.Layer.DeckBottom;
         }
-        cards[^1].layer = Cards.Layer.DeckTop;
+        if (cards.Count > 0) cards[^1].layer = Cards.Layer.DeckTop;
     }
 }
 
@@ -356,5 +392,13 @@ public class HandDeck(Vector2 pos, GameLayer parent) : Deck(pos, new Rectangle()
         {
             return cardPos + pos;
         }
+    }
+
+    public Rectangle GetBounds()
+    {
+        int offset = cards.Count > 1 ? Cards.LineOffset / 2 : Cards.CardHeight / 2;
+        int height = Cards.CardHeight + Cards.LineOffset * (cards.Count - 1);
+        Point intPos = pos.ToPoint();
+        return new Rectangle(intPos.X - Cards.CardWidth / 2, intPos.Y - offset, Cards.CardWidth, height);
     }
 }

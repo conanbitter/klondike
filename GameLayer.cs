@@ -146,6 +146,7 @@ public class GameLayer
                 hand.IsFixed = false;
                 AnimParallel animContainer = new();
                 var cards = Deck.MoveCards(deck, hand, deck.GetGrabCount(pos.Y));
+                deck.SetLayers();
                 foreach (Card card in cards)
                 {
                     card.layer = Cards.Layer.Hand;
@@ -179,23 +180,63 @@ public class GameLayer
     {
         if (hand.IsActive)
         {
-            var cards = Deck.MoveCards(hand, hand.previousOwner, hand.cards.Count);
+            Deck target = hand.previousOwner;
+
+            Rectangle handBounds = hand.GetBounds();
+            Deck closest = null;
+            float minDistance = float.MaxValue;
+            foreach (Deck deck in allDecks)
+            {
+                if (deck.BoundsDrop is Rectangle dropBounds &&
+                dropBounds.Intersects(handBounds) &&
+                deck.CanDrop(hand.cards[0]))
+                {
+                    float dx = dropBounds.X - handBounds.X;
+                    float dy = dropBounds.Y - handBounds.Y;
+                    float distance = dx * dx + dy * dy;
+                    if (distance < minDistance)
+                    {
+                        closest = deck;
+                        minDistance = distance;
+                    }
+                }
+            }
+            if (closest != null) target = closest;
+
+            var cards = Deck.MoveCards(hand, target, hand.cards.Count);
             AnimParallel animContainer = new();
             foreach (Card card in cards)
             {
                 card.layer = Cards.Layer.Flying;
                 animContainer.Add(new AnimCardMoveFixed(
                     card,
-                    hand.previousOwner.GetDesiredPos(card, false),
+                    target.GetDesiredPos(card, false),
                     0.2f,
                     Easing.EaseInOutCubic));
                 //card.pos = hand.previousOwner.GetDesiredPos(card, false);
             }
             animContainer.OnEnd += () =>
             {
-                hand.previousOwner.SetLayers();
-                hand.previousOwner.UpdateBounds();
+                target.SetLayers();
+                target.UpdateBounds();
             };
+            if (target != hand.previousOwner)
+            {
+
+                if (hand.previousOwner.cards.Count > 0 && hand.previousOwner.cards[^1].flipped)
+                {
+                    AnimCardFlip flip = new(hand.previousOwner.cards[^1]);
+                    flip.OnEnd += () =>
+                    {
+                        hand.previousOwner.UpdateBounds();
+                    };
+                    Animations.Add(flip);
+                }
+                else
+                {
+                    hand.previousOwner.UpdateBounds();
+                }
+            }
             Animations.Add(animContainer);
         }
         Console.WriteLine($"Drop     {pos.X,3} x {pos.Y,3}");
