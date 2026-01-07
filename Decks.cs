@@ -327,10 +327,12 @@ public class ReserveRightDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.P
         if (cards.Count > 0)
         {
             BoundsGrab = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
+            BoundsDblClick = BoundsGrab;
         }
         else
         {
             BoundsGrab = null;
+            BoundsDblClick = null;
         }
     }
 

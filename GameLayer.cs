@@ -91,7 +91,7 @@ public class GameLayer
             }
             //flatDecks[i].cards[^1].flipped = false;
             animCard.Add(new AnimCardFlip(lineDecks[i].cards[^1]));
-            if (i == 5)
+            /*if (i == 5)
             {
                 animCard.Add(new AnimCardFlip(lineDecks[i].cards[^2]));
             }
@@ -99,7 +99,7 @@ public class GameLayer
             {
                 animCard.Add(new AnimCardFlip(lineDecks[i].cards[^2]));
                 animCard.Add(new AnimCardFlip(lineDecks[i].cards[^3]));
-            }
+            }*/
         }
 
         animCard.OnEnd += () =>
@@ -163,8 +163,8 @@ public class GameLayer
                 break;
             }
         }
-        Console.WriteLine($"Grab     {pos.X,3} x {pos.Y,3}");
-        Console.WriteLine($"Hand     {hand.pos.X,3} x {hand.pos.Y,3}");
+        //Console.WriteLine($"Grab     {pos.X,3} x {pos.Y,3}");
+        //Console.WriteLine($"Hand     {hand.pos.X,3} x {hand.pos.Y,3}");
     }
 
     public void OnDrag(Point pos)
@@ -173,7 +173,7 @@ public class GameLayer
         {
             hand.UpdatePos(pos.ToVector2());
         }
-        Console.WriteLine($"Drag     {pos.X,3} x {pos.Y,3}");
+        //Console.WriteLine($"Drag     {pos.X,3} x {pos.Y,3}");
     }
 
     public void OnDrop(Point pos)
@@ -239,7 +239,7 @@ public class GameLayer
             }
             Animations.Add(animContainer);
         }
-        Console.WriteLine($"Drop     {pos.X,3} x {pos.Y,3}");
+        //Console.WriteLine($"Drop     {pos.X,3} x {pos.Y,3}");
     }
     public void OnClick(Point pos)
     {
@@ -309,7 +309,41 @@ public class GameLayer
     }
     public void OnDblClick(Point pos)
     {
-        Console.WriteLine($"DblClick {pos.X,3} x {pos.Y,3}");
+        foreach (Deck deck in allDecks)
+        {
+            if (deck.BoundsDblClick is Rectangle rect && rect.Contains(pos))
+            {
+                Card card = deck.cards[^1];
+                HomeDeck home = homeDecks[(int)card.suit - 1];
+                if ((home.cards.Count == 0 && card.rank == Rank.Ace) ||
+                (home.cards.Count > 0 && card.rank - home.cards[^1].rank == 1))
+                {
+                    Deck.MoveCards(deck, home);
+                    card.layer = Cards.Layer.Flying;
+                    deck.UpdateBounds();
+                    deck.SetLayers();
+                    home.ClearBounds();
+                    AnimParallel anim = new();
+                    if (deck.cards.Count > 0 && deck.cards[^1].flipped)
+                    {
+                        anim.Add(new AnimCardFlip(deck.cards[^1]));
+                    }
+                    anim.Add(new AnimCardMoveFixed(
+                        card,
+                        home.pos,
+                        0.3f,
+                        Easing.EaseOutCubic));
+                    anim.OnEnd += () =>
+                    {
+                        home.UpdateBounds();
+                        home.SetLayers();
+                    };
+                    Animations.Add(anim);
+                }
+                break;
+            }
+        }
+        //Console.WriteLine($"DblClick {pos.X,3} x {pos.Y,3}");
     }
 }
 
