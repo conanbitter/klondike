@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
@@ -270,6 +271,7 @@ public class ReserveLeftDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.Pl
 {
     public int index = -1;
     public Vector2 pos2 = new(pos.X + ReserveOffset, pos.Y);
+    public Animation lastAnim = null;
 
     private const int ReserveOffset = 52;
 
@@ -282,16 +284,16 @@ public class ReserveLeftDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.Pl
         }
     }
 
+    public void UpdateAnim(Animation newAnim)
+    {
+        if (lastAnim is Animation anim && newAnim != null) anim.Skip();
+        lastAnim = newAnim;
+    }
+
     public override void UpdateBounds()
     {
-        if (cards.Count > 0)
-        {
-            BoundsClick = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
-        }
-        else
-        {
-            BoundsClick = null;
-        }
+        BoundsClick = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
+
     }
 
     public override void SetLayers()
@@ -324,11 +326,11 @@ public class ReserveRightDeck(Vector2 pos, GameLayer parent) : Deck(pos, Atlas.P
     {
         if (cards.Count > 0)
         {
-            BoundsClick = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
+            BoundsGrab = new((int)pos.X, (int)pos.Y, Cards.CardWidth, Cards.CardHeight);
         }
         else
         {
-            BoundsClick = null;
+            BoundsGrab = null;
         }
     }
 

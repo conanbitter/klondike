@@ -5,9 +5,9 @@ using Microsoft.Xna.Framework;
 
 namespace klondike;
 
-delegate void AnimationEndHandler();
+public delegate void AnimationEndHandler();
 
-class Animation
+public class Animation
 {
     public bool Finished { get; private set; } = false;
 
@@ -340,16 +340,17 @@ class AnimCardMoveDynamic(Card card, Vector2 target, float duration, Deck root) 
 class AnimCardFlip(Card card) : Animation
 {
     private readonly Card card = card;
+    private readonly bool willBeFlipped = !card.flipped;
 
     protected override void OnUpdate(float deltaTime)
     {
-        card.flipped = false;
+        card.flipped = willBeFlipped;
         Finish();
     }
 
     protected override void OnSkip()
     {
-        card.flipped = false;
+        card.flipped = willBeFlipped;
     }
 }
 

@@ -85,8 +85,9 @@ static class AdvancedMouse
                 {
                     sinceLastClick = 0.0;
                     lastClickPos = state.Position;
-                    OnClick?.Invoke(state.Position / scale);
+                    //OnClick?.Invoke(state.Position / scale);
                 }
+                OnClick?.Invoke(state.Position / scale);
             }
             else if (mode == MouseMode.Dragging)
             {

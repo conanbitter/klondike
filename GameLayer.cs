@@ -243,7 +243,69 @@ public class GameLayer
     }
     public void OnClick(Point pos)
     {
-        Console.WriteLine($"Click    {pos.X,3} x {pos.Y,3}");
+        if (reserveLeft.BoundsClick is Rectangle clickBounds && clickBounds.Contains(pos))
+        {
+            if (reserveLeft.lastAnim is Animation lastAnim)
+            {
+                lastAnim.Skip();
+                reserveLeft.lastAnim = null;
+            }
+
+            if (reserveLeft.cards.Count > 0)
+            {
+                var cards = Deck.MoveCards(reserveLeft, reserveRight);
+                foreach (Card card in cards)
+                {
+                    //card.pos = reserveRight.pos;
+                    card.layer = Cards.Layer.Flying;
+                    AnimParallel anim = new();
+                    anim.Add(new AnimCardMoveFixed(
+                       card,
+                       reserveRight.pos,
+                       0.2f,
+                       Easing.EaseInOutCubic
+                    ));
+                    anim.Add(new AnimCardFlip(card));
+                    anim.OnEnd += () =>
+                    {
+                        reserveRight.SetLayers();
+                        reserveRight.UpdateBounds();
+                    };
+                    Animations.Add(anim);
+                    reserveLeft.lastAnim = anim;
+                    card.flipped = false;
+                }
+                reserveLeft.SetLayers();
+                reserveLeft.UpdateBounds();
+            }
+            else
+            {
+                reserveLeft.cards.AddRange(reserveRight.cards);
+                reserveLeft.cards.Reverse();
+                foreach (Card card in reserveLeft.cards.Skip(1))
+                {
+                    card.pos = reserveLeft.pos;
+                    card.flipped = true;
+                }
+                reserveLeft.cards[0].layer = Cards.Layer.Flying;
+                AnimParallel anim = new();
+                anim.Add(new AnimCardMoveFixed(
+                       reserveLeft.cards[0],
+                       reserveLeft.pos,
+                       0.2f,
+                       Easing.EaseInOutCubic
+                    ));
+                anim.Add(new AnimCardFlip(reserveLeft.cards[0]));
+                anim.OnEnd += () =>
+                {
+                    reserveLeft.SetLayers();
+                    reserveLeft.UpdateBounds();
+                };
+                Animations.Add(anim);
+                reserveRight.cards.Clear();
+            }
+        }
+
     }
     public void OnDblClick(Point pos)
     {
